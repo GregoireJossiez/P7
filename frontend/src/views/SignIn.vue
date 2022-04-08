@@ -14,6 +14,10 @@
   <div class="form">
     <label for="Email">Email</label>
     <input ref="email" type="text" name="Email" id="Email" required>
+    <label for="Name">Name</label>
+    <input ref="name" type="text" name="Name" id="Name" required>
+    <label for="familyName">familyName</label>
+    <input ref="familyName" type="text" name="familyName" id="familyName" required>
     <label for="Password">Password</label>
     <input ref="password" type="password" name="Password" id="Password" required>
     <button id="submit" @click="signIn" value="Sign in">Sign in</button>
@@ -32,26 +36,18 @@ export default {
     signIn() {
 
       console.log("test");
-      console.log("email : " + this.$refs.email.value + " password : " + this.$refs.password.value);
+      console.log("email : " + this.$refs.email.value + " name : " + this.$refs.name.value + " familyName : " + this.$refs.familyName.value + " password : " + this.$refs.password.value);
 
       const user = {
-        username: this.$refs.email.value,
+        email: this.$refs.email.value,
+        name: this.$refs.name.value,
+        familyName: this.$refs.familyName.value,
         password: this.$refs.password.value
       }
 
       console.log(user);
 
-      fetch('http://localhost:3000/api/auth/signup', {
-        method: 'POST',
-        body: JSON.stringify(user),
-        headers: {
-          'Content-Type': 'application/json;charset=utf-8'
-        },
-      }).then(function(response) {
-        return response.json({ response });
-      }).catch((err) => {
-        console.log("Problème avec fetch : " + err.message);
-      })
+      this.$store.dispatch('signIn', user);
     }
   }
 }

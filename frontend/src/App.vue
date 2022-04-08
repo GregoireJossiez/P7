@@ -4,6 +4,8 @@
     <router-link to="/contact">Contact</router-link> |
     <router-link to="/login">Login</router-link> |
     <router-link to="/signin">Sign-in</router-link> |
+    <router-link to="/newpost">Create a post</router-link> |
+    <router-link to="/posts">Posts</router-link> |
     <router-link to="/about">About</router-link>
   </nav>
   <router-view/>

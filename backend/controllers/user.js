@@ -9,7 +9,9 @@ exports.signup = (req, res, next) => {
   bcrypt.hash(req.body.password, 10)
     .then(hash => {
       const user = new User({
-        username: req.body.username,
+        email: req.body.email,
+        name: req.body.name,
+        familyName: req.body.familyName,
         password: hash
       })
       user.save()
@@ -20,7 +22,7 @@ exports.signup = (req, res, next) => {
 }
 
 exports.login = (req, res ,next) => {
-  User.findOne({ where : { username: req.body.username }})
+  User.findOne({ where : { email: req.body.email }})
     .then(user => {
       if (!user) {
         return res.status(401).json({ error: "Utilisateur non trouvé" })
@@ -29,12 +31,13 @@ exports.login = (req, res ,next) => {
         .then(valid => {
           if (!valid) {
             return res.status(401).json({ error: "Mot de passe incorrect"})
-            console.log(valid);
           }
           res.status(200).json({
-            userId: user._id,
+            userId: user.id,
+            name: user.name,
+            familyName: user.familyName,
             token: jwt.sign(
-              { userId: user._id },
+              { userId: user.id },
               "RANDOM_TOKEN_SECRET",
               { expiresIn: "24h" }
             )

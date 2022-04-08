@@ -3,6 +3,8 @@ import HomeView from '../views/HomeView.vue'
 import ContactView from '../views/ContactView.vue'
 import LogIn from '../views/LogIn.vue'
 import SignIn from '../views/SignIn.vue'
+import NewPost from '../views/newPost.vue'
+import Posts from '../views/Posts.vue'
 
 const routes = [
   {
@@ -24,6 +26,16 @@ const routes = [
     path: '/signin',
     name: 'signin',
     component: SignIn
+  },
+  {
+    path: '/newpost',
+    name: 'post',
+    component: NewPost
+  },
+  {
+    path: '/posts',
+    name: 'posts',
+    component: Posts
   },
   {
     path: '/about',

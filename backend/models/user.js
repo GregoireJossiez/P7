@@ -8,7 +8,16 @@ const sequelize = require("../db")
 
 const User = sequelize.define('user', {
   // Model attributes are defined here
-  username: {
+  email: {
+    type: Sequelize.DataTypes.STRING,
+    unique: true,
+    allowNull: false,
+  },
+  name: {
+    type:  Sequelize.DataTypes.STRING,
+    allowNull: false
+  },
+  familyName: {
     type:  Sequelize.DataTypes.STRING,
     allowNull: false
   },
@@ -19,12 +28,12 @@ const User = sequelize.define('user', {
   // Other model options go here
 })
 
-User.sync().then((data) => {
-  console.log("Table and model synced successfully !");
-}).catch((err) => {
-  console.log("Error syncing the table and model !");
-  console.log(err);
-})
+// User.sync().then((data) => {
+//   console.log("Table and model synced successfully !");
+// }).catch((err) => {
+//   console.log("Error syncing the table and model !");
+//   console.log(err);
+// })
 
 // User.sync().then((data) => {
 //   return User.findOne()
