@@ -18,6 +18,7 @@
 
 const { Sequelize, DataTypes, HasOne } = require('sequelize');
 const User = require("../models/user")
+const Like = require("../models/like")
 
 const sequelize = require("../db")
 
@@ -34,28 +35,33 @@ const Post = sequelize.define('post', {
   },
   likes: {
     type: Sequelize.DataTypes.INTEGER
-  },
-  dislikes: {
-    type: Sequelize.DataTypes.INTEGER
-  },
-  usersLiked: {
-    type: Sequelize.DataTypes.INTEGER
-  },
-  usersDisliked: {
-    type: Sequelize.DataTypes.INTEGER
-  },
+  }
   }, {
   // Other model options go here
 })
 
-User.hasMany(Post);
-Post.belongsTo(User);
+// User.hasMany(Post);
+// Post.belongsTo(User);
 
-Post.sync({ alter: true }).then((data) => {
-  console.log("Table and model synced successfully !");
-}).catch((err) => {
-  console.log("Error syncing the table and model !");
-  console.log(err);
-})
+User.belongsToMany(Post,{
+  through: Like
+});
+Post.belongsToMany(User,{
+  through: Like
+});
+
+// sequelize.sync({ alter: true }).then((data) => {
+//   console.log("Table and model synced successfully !");
+// }).catch((err) => {
+//   console.log("Error syncing the table and model !");
+//   console.log(err);
+// })
+
+// sequelize.sync({ alter: true }).then((data) => {
+//   Like.create({ hasLiked: true, userId: '12', postId: '46', userNames: "Mario Bros" });
+// }).catch((err) => {
+//   console.log("Error syncing the table and model !");
+//   console.log(err);
+// })
 
 module.exports = sequelize.models.post

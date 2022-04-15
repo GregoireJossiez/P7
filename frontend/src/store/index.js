@@ -26,7 +26,7 @@ export default createStore({
   actions: {
     logIn(context, user) {
 
-      fetch('http://localhost:3000/api/auth/login', {
+      fetch('http://192.168.0.18:3000/api/auth/login', {
         method: 'POST',
         body: JSON.stringify(user),
         headers: {
@@ -49,7 +49,7 @@ export default createStore({
     },
     signIn(context, user) {
 
-      fetch('http://localhost:3000/api/auth/signup', {
+      fetch('http://192.168.0.18:3000/api/auth/signup', {
         method: 'POST',
         body: JSON.stringify(user),
         headers: {
@@ -68,11 +68,13 @@ export default createStore({
       console.log("userId: " + post.userId);
       console.log("token: " + post.token);
 
-      fetch('http://localhost:3000/api/post/', {
+      console.log(post);
+
+      fetch('http://192.168.0.18:3000/api/post/', {
         method: 'POST',
         body: JSON.stringify(post),
         headers: {
-          'Content-Type': 'application/json;charset=utf-8',
+          'Content-Type': 'multipart/form-data',
           'Authorization': 'Bearer ' + post.token
         },
       }).then(function(response) {
@@ -82,9 +84,9 @@ export default createStore({
       })
     },
     addLike(context, like) {
-      console.log(like.postId);
+      console.log(like);
 
-      fetch('http://localhost:3000/api/post/like/', {
+      fetch('http://192.168.0.18:3000/api/post/like/', {
         method: 'POST',
         body: JSON.stringify(like),
         headers: {

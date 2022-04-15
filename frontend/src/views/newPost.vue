@@ -14,6 +14,8 @@
   <div class="form">
     <label for="post">Your post</label>
     <textarea ref="post" id="post" name="Post" rows="8" cols="80"></textarea>
+    <label for="media">Add a media</label>
+    <input ref="media" id="media" type="file" name="media" value="">
     <button id="submit" @click="post">Post</button>
     <p>{{  $store.state.user }}</p>
   </div>
@@ -33,6 +35,7 @@ export default {
       // Retrieving user data in the localStorage
 
       const user = JSON.parse(localStorage.getItem("user"))
+      // const file = this.$refs.media.files[0]
 
       // Assembling the request body to fetch
 
@@ -41,12 +44,15 @@ export default {
         name: user.name,
         familyName: user.familyName,
         token: user.token,
-        content: this.$refs.post.value
+        content: this.$refs.post.value,
+        file: this.$refs.media.files[0]
       }
 
       // Calling the function in the $store
 
+      console.log(this.$refs.media.files[0]);
       this.$store.dispatch('newPost', post);
+      // window.location.reload()
     }
   }
 }
@@ -60,7 +66,7 @@ export default {
   gap: 15px;
 
 }
-textarea, button {
+textarea, button, input {
   margin: auto;
   width: 500px;
 }

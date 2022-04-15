@@ -6,10 +6,24 @@
     <router-link to="/signin">Sign-in</router-link> |
     <router-link to="/newpost">Create a post</router-link> |
     <router-link to="/posts">Posts</router-link> |
-    <router-link to="/about">About</router-link>
+    <router-link to="/settings">Settings</router-link>
+    <p id="logout" @click="logOut">Logout</p>
   </nav>
   <router-view/>
 </template>
+
+<script>
+
+export default {
+  methods: {
+    logOut() {
+      localStorage.clear()
+      window.location.reload()
+    }
+  }
+}
+
+</script>
 
 <style lang="scss">
 #app {
@@ -30,6 +44,18 @@ nav {
     &.router-link-exact-active {
       color: #42b983;
     }
+  }
+}
+
+#logout {
+  text-align: center;
+  width: 100px;
+  cursor: pointer;
+  border: 1px solid black;
+  border-radius: 25px;
+  font-weight: bold;
+  &:hover {
+    background-color: lightblue;
   }
 }
 </style>

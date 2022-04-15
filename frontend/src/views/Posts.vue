@@ -12,6 +12,7 @@
       </div>
       <div class="reaction">
         <p class="likes">Like <span class="numberOfLikes">5</span></p>
+        <img class="likeBtnImg" src="../assets/like-button.png" alt="">
       </div>
     </div> -->
   </div>
@@ -64,10 +65,12 @@ export default {
       const $postLikes = document.createElement("p")
       $postLikes.classList.add("likes")
       $postLikes.addEventListener("click", addLikes)
-      $postLikes.textContent = "Like "
+      $postLikes.setAttribute("isLiked", post.liked)
+      $postLikes.textContent = "Like"
 
-      const $numberOfLikes = document.createElement("span")
+      const $numberOfLikes = document.createElement("p")
       $numberOfLikes.classList.add("numberOfLikes")
+      $numberOfLikes.setAttribute("id", `like${post.id}`)
       $numberOfLikes.textContent = post.likes
 
       $post.appendChild($postAuthor)
@@ -77,7 +80,7 @@ export default {
 
       $post.appendChild($postContentDiv)
 
-      $postLikes.appendChild($numberOfLikes)
+      $postReaction.appendChild($numberOfLikes)
 
       $postReaction.appendChild($postLikes)
 
@@ -91,13 +94,41 @@ export default {
     const addLikes = async (e) => {
       let target = e.target.closest(".post")
       let postid = +target.attributes.postid.value
+      let likeCount = document.getElementById(`like${postid}`)
 
-    const like = {
-      postId: postid,
-      token: token
-    }
+      let likeState = e.target.attributes.isLiked.value
+      let $like = e.target
+      console.log(likeState);
 
-      this.$store.dispatch('addLike', like);
+      if (likeState === "true") {
+        likeCount.textContent--
+        console.log("UNLIKE");
+        $like.setAttribute("isLiked", "false")
+
+        const like = {
+          userId: user.id,
+          userNames: user.name + " " + user.familyName,
+          postId: postid,
+          like: 0,
+          token: token
+        }
+
+          this.$store.dispatch('addLike', like);
+      } else {
+        likeCount.textContent++
+        console.log("LIKE");
+        $like.setAttribute("isLiked", "true")
+
+        const like = {
+          userId: user.id,
+          userNames: user.name + " " + user.familyName,
+          postId: postid,
+          like: 1,
+          token: token
+        }
+
+          this.$store.dispatch('addLike', like);
+      }
     }
 
     const main = async () => {
@@ -105,7 +136,7 @@ export default {
       // Retrieve all posts from DB
 
       const getAllPosts = async () => {
-        fetch('http://localhost:3000/api/post/', {
+        fetch('http://192.168.0.18:3000/api/post/', {
           method: 'get',
           headers: {
             'Content-Type': 'application/json;charset=utf-8',
@@ -115,8 +146,22 @@ export default {
           return response.json({ response });
         }).then((data) => {
           data.forEach((post) => {
+
+            post.liked = false
+
+            post.users.forEach((postData) => {
+
+              if (postData.id === user.id) {
+                post.liked = postData.like.hasLiked
+              }
+            })
+
+            if (!post.users.length) {
+              post.liked = false
+            }
+
             $posts.appendChild(createPost(post))
-          });
+          })
         }).catch((err) => {
           console.log("Problème avec fetch : " + err.message);
         })
@@ -181,7 +226,7 @@ p {
 }
 
 .likes {
-  width: 50px;
+  width: 20px;
 }
 
 .likes:hover {
@@ -189,8 +234,17 @@ p {
   cursor: pointer;
 }
 
-.numberOfLikes {
-  font-weight: normal;
+p[isLiked="false"] {
+
 }
 
+p[isLiked="true"] {
+  color: #0080FF;
+  font-weight: bold;
+}
+
+.numberOfLikes {
+  text-align: left;
+  font-weight: normal;
+}
 </style>
