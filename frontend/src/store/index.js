@@ -24,9 +24,12 @@ export default createStore({
     }
   },
   actions: {
+
+    // Login function
+
     logIn(context, user) {
 
-      fetch('http://192.168.0.18:3000/api/auth/login', {
+      fetch('http://localhost:3000/api/auth/login', {
         method: 'POST',
         body: JSON.stringify(user),
         headers: {
@@ -47,9 +50,12 @@ export default createStore({
         console.log("Problème avec fetch : " + err.message);
       })
     },
+
+    // SignIn function
+
     signIn(context, user) {
 
-      fetch('http://192.168.0.18:3000/api/auth/signup', {
+      fetch('http://localhost:3000/api/auth/signup', {
         method: 'POST',
         body: JSON.stringify(user),
         headers: {
@@ -61,21 +67,25 @@ export default createStore({
         console.log("Problème avec fetch : " + err.message);
       })
     },
-    newPost(context, post) {
+
+    // New Post function
+
+    newPost(context, formData) {
 
       // const token = JSON.parse(localStorage.getItem("token"))
 
-      console.log("userId: " + post.userId);
-      console.log("token: " + post.token);
+      // console.log("userId: " + post.userId);
+      // console.log("token: " + post.token);
 
-      console.log(post);
+      console.log(formData);
+      console.log(formData.get("content"));
 
-      fetch('http://192.168.0.18:3000/api/post/', {
+      fetch('http://localhost:3000/api/post/', {
         method: 'POST',
-        body: JSON.stringify(post),
+        body: formData,
         headers: {
-          'Content-Type': 'multipart/form-data',
-          'Authorization': 'Bearer ' + post.token
+          // 'Content-Type': 'multipart/form-data',
+          'Authorization': 'Bearer ' + formData.get("token")
         },
       }).then(function(response) {
         return response.json({ response });
@@ -83,10 +93,13 @@ export default createStore({
         console.log("Problème avec fetch : " + err.message);
       })
     },
+
+    // Add Like function
+
     addLike(context, like) {
       console.log(like);
 
-      fetch('http://192.168.0.18:3000/api/post/like/', {
+      fetch('http://localhost:3000/api/post/like/', {
         method: 'POST',
         body: JSON.stringify(like),
         headers: {
@@ -98,7 +111,55 @@ export default createStore({
       }).catch((err) => {
         console.log("Problème avec fetch : " + err.message);
       })
-    }
+    },
+
+    // Modify Post function
+
+    modifyPost(context, post) {
+      console.log(post);
+    },
+
+    // Delete Post function
+
+    deletePost(context, user) {
+      console.log(user);
+
+      fetch(`http://localhost:3000/api/post/${user.postid}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json;charset=utf-8',
+          'Authorization': 'Bearer ' + user.token
+        },
+      }).then(function(response) {
+        return response.json({ response });
+      }).catch((err) => {
+        console.log("Problème avec fetch : " + err.message);
+      })
+    },
+
+    // Modify User function
+
+    modifyUser(context, post) {
+      console.log(post);
+    },
+
+    // Delete User function
+
+    deleteUser(context, user) {
+      console.log(user);
+
+      fetch(`http://localhost:3000/api/post/user/${user.id}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json;charset=utf-8',
+          'Authorization': 'Bearer ' + user.token
+        },
+      }).then(function(response) {
+        return response.json({ response });
+      }).catch((err) => {
+        console.log("Problème avec fetch : " + err.message);
+      })
+    },
   },
   modules: {
   },

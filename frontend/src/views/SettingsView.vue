@@ -95,6 +95,7 @@ export default {
       const $updateUserBtn = document.createElement("button")
       $updateUserBtn.classList.add("updateAccountBtn")
       $updateUserBtn.textContent = "Update account"
+      $updateUserBtn.addEventListener("click", updateUser)
 
       const $deleteBtn = document.createElement("div")
       $deleteBtn.classList.add("deleteBtn")
@@ -102,6 +103,7 @@ export default {
       const $deleteUserBtn = document.createElement("button")
       $deleteUserBtn.classList.add("deleteAccountBtn")
       $deleteUserBtn.textContent = "Delete account"
+      $deleteUserBtn.addEventListener("click", deleteUser)
 
       $userName.appendChild($userNameLabel)
       $userName.appendChild($userNameInput)
@@ -135,9 +137,22 @@ export default {
       return $userSettings
     }
 
+    const updateUser = async () => {
+      console.log("update");
+    }
+
+    const deleteUser = async () => {
+      console.log("delete");
+
+      this.$store.dispatch('deleteUser', user).then(() => {
+        localStorage.clear()
+        window.location.reload()
+      })
+    }
+
     const main = async () => {
 
-      fetch(`http://192.168.0.18:3000/api/post/user/${user.id}`, {
+      fetch(`http://localhost:3000/api/post/user/${user.id}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json;charset=utf-8',

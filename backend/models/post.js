@@ -33,7 +33,13 @@ const Post = sequelize.define('post', {
   content: {
     type: Sequelize.DataTypes.STRING
   },
+  imageUrl: {
+    type: Sequelize.DataTypes.STRING
+  },
   likes: {
+    type: Sequelize.DataTypes.INTEGER
+  },
+  userId: {
     type: Sequelize.DataTypes.INTEGER
   }
   }, {

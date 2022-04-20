@@ -11,14 +11,16 @@
       <input type="submit" value="Sign in">
     </div>
   </form> -->
-  <div class="form">
-    <label for="post">Your post</label>
-    <textarea ref="post" id="post" name="Post" rows="8" cols="80"></textarea>
-    <label for="media">Add a media</label>
-    <input ref="media" id="media" type="file" name="media" value="">
-    <button id="submit" @click="post">Post</button>
-    <p>{{  $store.state.user }}</p>
-  </div>
+  <form class="" action="" method="" enctype="multipart/form-data">
+    <div class="form">
+      <label for="post">Your post</label>
+      <textarea ref="post" id="post" name="Post" rows="8" cols="80"></textarea>
+      <label for="media">Add a media</label>
+      <input ref="media" id="media" type="file" name="media" value="">
+      <button id="submit" @click="post">Post</button>
+      <p>{{  $store.state.user }}</p>
+    </div>
+  </form>
 </template>
 
 <script>
@@ -35,23 +37,32 @@ export default {
       // Retrieving user data in the localStorage
 
       const user = JSON.parse(localStorage.getItem("user"))
-      // const file = this.$refs.media.files[0]
 
       // Assembling the request body to fetch
 
-      const post = {
-        userId: user.id,
-        name: user.name,
-        familyName: user.familyName,
-        token: user.token,
-        content: this.$refs.post.value,
-        file: this.$refs.media.files[0]
-      }
+      // const post = {
+      //   userId: user.id,
+      //   name: user.name,
+      //   familyName: user.familyName,
+      //   token: user.token,
+      //   content: this.$refs.post.value,
+      //   file: this.$refs.media.files[0]
+      // }
+
+      const formData = new FormData()
+      formData.append("user", user)
+      formData.append("userId", user.id)
+      formData.append("name", user.name)
+      formData.append("familyName", user.familyName)
+      formData.append("token", user.token)
+      formData.append("content", this.$refs.post.value)
+      formData.append("image", this.$refs.media.files[0])
 
       // Calling the function in the $store
 
+      event.preventDefault()
       console.log(this.$refs.media.files[0]);
-      this.$store.dispatch('newPost', post);
+      this.$store.dispatch('newPost', formData);
       // window.location.reload()
     }
   }
