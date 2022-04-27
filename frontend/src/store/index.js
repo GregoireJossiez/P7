@@ -117,6 +117,20 @@ export default createStore({
 
     modifyPost(context, post) {
       console.log(post);
+      console.log(post.get("imageUrl"));
+
+      fetch(`http://localhost:3000/api/post/${post.get("id")}`, {
+        method: 'PUT',
+        body: post,
+        headers: {
+          // 'Content-Type': 'multipart/form-data',
+          'Authorization': 'Bearer ' + post.get("token")
+        },
+      }).then(function(response) {
+        return response.json({ response });
+      }).catch((err) => {
+        console.log("Problème avec fetch : " + err.message);
+      })
     },
 
     // Delete Post function

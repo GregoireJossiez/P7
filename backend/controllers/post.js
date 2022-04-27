@@ -71,7 +71,7 @@ exports.deleteUser = (req, res, next) => {
           }
         })
         Post.destroy({ where: { userId: req.params.id }})
-        .then(() => res.status(200).json({message: "Objet supprimé"}))
+        .then(() => res.status(200).json({ message: "Objet supprimé" }))
         .catch(error => res.status(400).json({ error }))
       })
       .catch(error => res.status(400).json({ error }))
@@ -120,18 +120,68 @@ if (!req.file) {
 //   .catch(error => res.status(400).json({ error }))
 // }
 
+// exports.modifyPost = (req, res, next) => {
+//   const postImage = req.file ?
+//     {
+//       content: req.body.content,
+//       userId: req.body.userid,
+//       authorName: req.body.name,
+//       authorFamilyName: req.body.familyName,
+//       imageUrl: `${req.protocol}://${req.get("host")}/images/${req.file.filename}`
+//     } : { ...req.body }
+//   Post.update({ where: { id: req.params.id }}, {...postImage, where: { id: req.params.id }})
+//   .then(() => res.status(200).json({message: "Objet modifié"}))
+//   .catch(error => res.status(400).json({ error }))
+// }
+
 exports.modifyPost = (req, res, next) => {
-  const postImage = req.file ?
-    {
-      content: req.body.content,
-      userId: req.body.userid,
-      authorName: req.body.name,
-      authorFamilyName: req.body.familyName,
-      imageUrl: `${req.protocol}://${req.get("host")}/images/${req.file.filename}`
-    } : { ...req.body }
-  Post.updateOne({ where: { id: req.params.id }}, {...postImage, where: { id: req.params.id }})
-  .then(() => res.status(200).json({message: "Objet modifié"}))
-  .catch(error => res.status(400).json({ error }))
+  if (!req.file) {
+    if (req.body.imgRemoved === "true") {
+      const filename = req.body.imageUrl.split("/images/")[1]
+      fs.unlink(`images/${filename}`, () => {
+        Post.update({
+          content: req.body.content,
+          imageUrl: null
+        }, {
+          where: {
+            id: req.params.id
+          }})
+        .then(() => res.status(200).json({message: "Objet modifié - imgRemoved1" + " " + filename}))
+        .catch(error => res.status(400).json({ error }))
+      })
+    } else {
+      Post.update({
+        content: req.body.content,
+      }, {
+        where: {
+          id: req.params.id
+        }})
+      .then(() => res.status(200).json({message: "Objet modifié - ONLY TEXT"}))
+      .catch(error => res.status(400).json({ error }))
+      }
+    } else {
+      if (req.body.imgRemoved == true) {
+        Post.update({
+          content: req.body.content,
+          imageUrl: null
+        }, {
+          where: {
+            id: req.params.id
+          }})
+        .then(() => res.status(200).json({message: "Objet modifié - imgRemoved2"}))
+        .catch(error => res.status(400).json({ error }))
+      } else {
+        Post.update({
+          content: req.body.content,
+          imageUrl: `${req.protocol}://${req.get("host")}/images/${req.file.filename}`
+        }, {
+          where: {
+            id: req.params.id
+          }})
+        .then(() => res.status(200).json({message: "Objet modifié"}))
+        .catch(error => res.status(400).json({ error }))
+      }
+  }
 }
 
 exports.deletePost = (req, res, next) => {
@@ -150,23 +200,23 @@ exports.deletePost = (req, res, next) => {
       if (post.imageUrl != null) {
         const filename = post.imageUrl.split("/images/")[1]
         fs.unlink(`images/${filename}`, () => {
-          Post.findOne({ where: { id: req.params.id }}).then(
-            (post) => {
-              if (!post) {
-                return res.status(404).json({
-                  error: new Error("Objet non trouvé")
-                })
-              }
-              if (post.userId !== req.auth.userId) {
-                return res.status(401).json({
-                  error: new Error("Requête non autorisée")
-                })
-              }
-              Post.destroy({ where: { id: req.params.id }})
-              .then(() => res.status(200).json({message: "Objet supprimé"}))
-              .catch(error => res.status(400).json({ error }))
-            }
-          )
+          // Post.findOne({ where: { id: req.params.id }}).then(
+          //   (post) => {
+          //     if (!post) {
+          //       return res.status(404).json({
+          //         error: new Error("Objet non trouvé")
+          //       })
+          //     }
+          //     if (post.userId !== req.auth.userId) {
+          //       return res.status(401).json({
+          //         error: new Error("Requête non autorisée")
+          //       })
+          //     }
+          //     Post.destroy({ where: { id: req.params.id }})
+          //     .then(() => res.status(200).json({message: "Objet supprimé"}))
+          //     .catch(error => res.status(400).json({ error }))
+          //   }
+          // )
         })
       }
       Post.destroy({ where: { id: req.params.id }})
@@ -175,56 +225,6 @@ exports.deletePost = (req, res, next) => {
     })
     .catch(error => res.status(500).json({ error }))
 }
-
-// exports.likePost = (req, res, next) => {
-//   Post.increment({ likes: 1}, { where: { id: req.body.postId }})
-//   .then(post => res.status(200).json({ message: "Liked" }))
-//   .catch(error => res.status(404).json({ error }))
-// }
-
-// exports.likePost = (req, res, next) => {
-//   Like.findAll({ where: {
-//     postId: req.body.postId,
-//     userId: req.body.userId
-//   }})
-//   .then(post => {
-//     let hasLiked = post.hasLiked
-//     const like = new Like({
-//       hasLiked: 1,
-//       userId: req.body.userId,
-//       postId: req.body.postId,
-//       userNames: req.body.userNames
-//     })
-//     like.save()
-//     .then(() => res.status(201).json({ message: "Post liked"}))
-//     .catch(error => res.status(400).json({ error }))
-//   })
-//   .catch(error => res.status(404).json({ error }))
-// }
-
-// exports.likePost = (req, res, next) => {
-//   Like.findAll({ where: {
-//     postId: req.body.postId,
-//     userId: req.body.userId
-//   }})
-//   .then((post) => {
-//     if (!post.length) {
-//       return res.status(404).json({ message: "No data" })
-//     } else {
-//       return res.status(200).json({ post })
-//     }
-//   })
-//   .catch(error => res.status(404).json({ error }))
-// }
-
-// exports.getLike = (req, res, next) => {
-//   Like.findOne({ where: {
-//     postId: req.params.id,
-//     userId: req.params.userid
-//   }})
-//   .then(data => res.status(200).json(data))
-//   .catch(error => res.status(400).json({ error }))
-// }
 
 exports.likePost = (req, res, next) => {
   const like = req.body.like

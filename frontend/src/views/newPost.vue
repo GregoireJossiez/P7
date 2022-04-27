@@ -75,11 +75,11 @@ export default {
   display: flex;
   flex-direction: column;
   gap: 15px;
-
 }
+
 textarea, button, input {
   margin: auto;
-  width: 500px;
+  max-width: 700px;
 }
 
 </style>
