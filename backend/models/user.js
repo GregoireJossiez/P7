@@ -1,8 +1,4 @@
 const { Sequelize, DataTypes } = require('sequelize');
-// const sequelize = new Sequelize('GROUPOMANIA_DB', 'root', 'toor', {
-//   host: 'localhost',
-//   dialect: 'mysql'
-// });
 
 const sequelize = require("../db")
 
@@ -23,12 +19,16 @@ const User = sequelize.define('user', {
   },
   password: {
     type: Sequelize.DataTypes.STRING
+  },
+  avatar: {
+    type: Sequelize.DataTypes.STRING,
+    defaultValue: "http://localhost:3000/images/default-avatar-1.jpeg"
   }
   }, {
   // Other model options go here
 })
 
-// User.sync().then((data) => {
+// User.sync({ alter: true }).then((data) => {
 //   console.log("Table and model synced successfully !");
 // }).catch((err) => {
 //   console.log("Error syncing the table and model !");

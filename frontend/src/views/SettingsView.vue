@@ -1,6 +1,87 @@
 <template>
+  <div id="changeAvatarPopup" class="popup">
+    <div class="changeAvatarPopup">
+      <button id="close" @click="closePopup">&times;</button>
+      <span class="avatar">
+        <label for="media">Upload avatar</label>
+        <input ref="media" id="media" type="file" name="media" value="">
+      </span>
+      <button id="cancel" @click="closePopup" class="changePasswordPopup-btn changePasswordPopup-btn__cancel" type="button" name="cancel">Cancel</button>
+      <button id="submit" @click="changeAvatar" class="changePasswordPopup-btn changePasswordPopup-btn__delete" type="button" name="submit">Modify</button>
+    </div>
+  </div>
+  <div id="modifyUserPopup" class="popup">
+    <div class="modifyUserPopup">
+      <button id="close" @click="closePopup">&times;</button>
+      <span>
+        <label for="name-popup">Name : </label>
+        <input id="name-popup" ref="name" type="text" name="" value="" required>
+
+        <label for="familyName-popup">Family name : </label>
+        <input id="familyName-popup" ref="familyName" type="text" name="" value="" required>
+
+        <label for="email-popup">Email : </label>
+        <input id="email-popup" ref="email" type="email" name="" value="" required>
+      </span>
+      <button id="cancel" @click="closePopup" class="changePasswordPopup-btn changePasswordPopup-btn__cancel" type="button" name="cancel">Cancel</button>
+      <button id="submit" @click="modifyUser" class="changePasswordPopup-btn changePasswordPopup-btn__delete" type="button" name="submit">Modify</button>
+    </div>
+  </div>
+  <div id="changePasswordPopup" class="popup">
+    <div class="changePasswordPopup">
+      <button id="close" @click="closePopup">&times;</button>
+      <div class="changePasswordForm">
+        <span>
+          <label for="Current">Current : </label>
+          <input id="current" @focusout="formVerif" class="passInput" ref="current" type="password" name="" value="" required>
+        </span>
+        <span>
+          <label for="new">New : </label>
+          <input id="new" @focusout="formVerif" class="passInput" ref="new" type="password" name="" value="" required>
+        </span>
+        <span>
+          <label for="confirm">Confirm : </label>
+          <input id="confirm" @focusout="formVerif" class="passInput" ref="confirm" type="password" name="" value="" required>
+        </span>
+        <span>
+          <p id="res" class="warning">{{ $store.state.passwordMessage }}</p>
+        </span>
+      </div>
+      <button id="cancel" @click="closePopup" class="changePasswordPopup-btn changePasswordPopup-btn__cancel" type="button" name="cancel">Cancel</button>
+      <button id="delete" @click="changePassword" class="changePasswordPopup-btn changePasswordPopup-btn__delete" type="button" name="delete">Change</button>
+    </div>
+  </div>
+  <div id="deletePostPopup" class="popup">
+    <div class="deletePopup">
+      <button id="close" @click="closePopup">&times;</button>
+      <p class="deletePopup-txt">Are you sure you want to delete your account ?</p>
+      <button id="cancel" @click="closePopup" class="deletePopup-btn deletePopup-btn__cancel" type="button" name="cancel">Cancel</button>
+      <button id="delete" @click="deleteUser" class="deletePopup-btn deletePopup-btn__delete" type="button" name="delete">Delete</button>
+    </div>
+  </div>
   <div id="settings">
     <h1>User settings</h1>
+    <div id="userinfo" class="userinfo">
+      <div class="avatar">
+        <img id="userAvatar" @mouseover="showChangeAvatarBtn" @mouseleave="showChangeAvatarBtn" src="" alt="">
+        <button id="changeAvatar" @mouseover="showChangeAvatarBtn" @mouseleave="showChangeAvatarBtn" @click="changeAvatarPopup" class="btn" type="button" name="button">Change</button>
+      </div>
+      <span>
+        <label for="name">Name : </label>
+        <input id="name" type="text" name="" value="" disabled>
+      </span>
+      <span>
+        <label for="familyName">Family name : </label>
+        <input id="familyName" type="text" name="" value="" disabled>
+      </span>
+      <span>
+        <label for="email">Email : </label>
+        <input id="email" type="email" name="" value="" disabled>
+      </span>
+      <button id="modify" @click="modifyUserPopup" type="button" name="button">Modify</button>
+      <button id="changePassword" @click="changePasswordPopup" type="button" name="button">Change your password</button>
+      <button id="delete" @click="deleteUserPopup" type="button" name="button">Delete your account</button>
+    </div>
   </div>
 </template>
 
@@ -12,142 +93,25 @@ export default {
 
     const user = JSON.parse(localStorage.getItem("user"))
 
-    const $settings = document.getElementById("settings")
+    // const $settings = document.getElementById("settings")
 
-    const createUserSettings = (user) => {
+    const writeUserSettings = (user) => {
 
-      const $userSettings = document.createElement("div")
-      $userSettings.classList.add("userSettings")
+      const $userInfo = document.getElementById("userinfo")
 
-      const $userName = document.createElement("div")
-      $userName.classList.add("userName")
+      const $userAvatar = document.getElementById("userAvatar")
+      $userAvatar.attributes.src.value = user.avatar
 
-      const $userNameLabel = document.createElement("label")
-      $userNameLabel.setAttribute("for", "userName")
-      $userNameLabel.textContent = "Name : "
+      const $userName = document.getElementById("name")
+      $userName.value = user.name
 
-      const $userNameInput = document.createElement("input")
-      $userNameInput.setAttribute("id", "userName")
-      $userNameInput.setAttribute("value", user.name)
+      const $userFamilyName = document.getElementById("familyName")
+      $userFamilyName.value = user.familyName
 
-      const $userFamilyName = document.createElement("div")
-      $userFamilyName.classList.add("userFamilyName")
+      const $userEmail = document.getElementById("email")
+      $userEmail.value = user.email
 
-      const $userFamilyNameLabel = document.createElement("label")
-      $userFamilyNameLabel.setAttribute("for", "userFamilyName")
-      $userFamilyNameLabel.textContent = "Family name : "
-
-      const $userFamilyNameInput = document.createElement("input")
-      $userFamilyNameInput.setAttribute("id", "userFamilyName")
-      $userFamilyNameInput.setAttribute("value", user.familyName)
-
-      const $userEmail = document.createElement("div")
-      $userEmail.classList.add("userEmail")
-
-      const $userEmailLabel = document.createElement("label")
-      $userEmailLabel.setAttribute("for", "userEmail")
-      $userEmailLabel.textContent = "Email : "
-
-      const $userEmailInput = document.createElement("input")
-      $userEmailInput.setAttribute("id", "userEmail")
-      $userEmailInput.setAttribute("type", "email")
-      $userEmailInput.setAttribute("value", user.email)
-
-      const $userPassword = document.createElement("div")
-      $userPassword.classList.add("userPassword")
-
-      const $userPreviousPassword = document.createElement("span")
-
-      const $userPreviousPasswordLabel = document.createElement("label")
-      $userPreviousPasswordLabel.setAttribute("for", "userPreviousPassword")
-      $userPreviousPasswordLabel.textContent = "Previous password : "
-
-      const $userPreviousPasswordInput = document.createElement("input")
-      $userPreviousPasswordInput.setAttribute("id", "userPreviousPassword")
-      $userPreviousPasswordInput.setAttribute("type", "password")
-      $userPreviousPasswordInput.setAttribute("value", "")
-
-      const $userNewPassword = document.createElement("span")
-
-      const $userPasswordLabel = document.createElement("label")
-      $userPasswordLabel.setAttribute("for", "userPassword")
-      $userPasswordLabel.textContent = "New password : "
-
-      const $userPasswordInput = document.createElement("input")
-      $userPasswordInput.setAttribute("id", "userPassword")
-      $userPasswordInput.setAttribute("type", "password")
-      $userPasswordInput.setAttribute("value", "")
-
-      const $userNewPassword2 = document.createElement("span")
-
-      const $userPasswordLabel2 = document.createElement("label")
-      $userPasswordLabel2.setAttribute("for", "userPassword2")
-      $userPasswordLabel2.textContent = "New password : "
-
-      const $userPasswordInput2 = document.createElement("input")
-      $userPasswordInput2.setAttribute("id", "userPassword2")
-      $userPasswordInput2.setAttribute("type", "password")
-      $userPasswordInput2.setAttribute("value", "")
-
-      const $updateBtn = document.createElement("div")
-      $updateBtn.classList.add("updateBtn")
-
-      const $updateUserBtn = document.createElement("button")
-      $updateUserBtn.classList.add("updateAccountBtn")
-      $updateUserBtn.textContent = "Update account"
-      $updateUserBtn.addEventListener("click", updateUser)
-
-      const $deleteBtn = document.createElement("div")
-      $deleteBtn.classList.add("deleteBtn")
-
-      const $deleteUserBtn = document.createElement("button")
-      $deleteUserBtn.classList.add("deleteAccountBtn")
-      $deleteUserBtn.textContent = "Delete account"
-      $deleteUserBtn.addEventListener("click", deleteUser)
-
-      $userName.appendChild($userNameLabel)
-      $userName.appendChild($userNameInput)
-      $userSettings.appendChild($userName)
-
-      $userFamilyName.appendChild($userFamilyNameLabel)
-      $userFamilyName.appendChild($userFamilyNameInput)
-      $userSettings.appendChild($userFamilyName)
-
-      $userEmail.appendChild($userEmailLabel)
-      $userEmail.appendChild($userEmailInput)
-      $userSettings.appendChild($userEmail)
-
-      $userPreviousPassword.appendChild($userPreviousPasswordLabel)
-      $userPreviousPassword.appendChild($userPreviousPasswordInput)
-      $userNewPassword.appendChild($userPasswordLabel)
-      $userNewPassword.appendChild($userPasswordInput)
-      $userNewPassword2.appendChild($userPasswordLabel2)
-      $userNewPassword2.appendChild($userPasswordInput2)
-
-      $userPassword.appendChild($userPreviousPassword)
-      $userPassword.appendChild($userNewPassword)
-      $userPassword.appendChild($userNewPassword2)
-      $userSettings.appendChild($userPassword)
-
-      $updateBtn.appendChild($updateUserBtn)
-      $deleteBtn.appendChild($deleteUserBtn)
-      $userSettings.appendChild($updateBtn)
-      $userSettings.appendChild($deleteBtn)
-
-      return $userSettings
-    }
-
-    const updateUser = async () => {
-      console.log("update");
-    }
-
-    const deleteUser = async () => {
-      console.log("delete");
-
-      this.$store.dispatch('deleteUser', user).then(() => {
-        localStorage.clear()
-        window.location.reload()
-      })
+      return $userInfo
     }
 
     const main = async () => {
@@ -161,7 +125,7 @@ export default {
       }).then((res) => {
         return res.json({ res })
       }).then((user) => {
-        $settings.appendChild(createUserSettings(user))
+        writeUserSettings(user)
       }).catch((err) => {
         console.log(err);
       })
@@ -170,37 +134,328 @@ export default {
 
     main()
   },
+  methods: {
+
+    modifyUserPopup() {
+      const user = JSON.parse(localStorage.getItem("user"))
+      let popup = document.getElementById("modifyUserPopup")
+      let popupActive = popup.classList.contains("popup-active")
+
+      if (popupActive === false) {
+        popup.classList.add("popup-active")
+        document.querySelector("body").style.overflow = "hidden"
+        document.getElementById("name-popup").value = user.name
+        document.getElementById("familyName-popup").value = user.familyName
+        document.getElementById("email-popup").value = user.email
+      } else {
+        popup.classList.remove("popup-active")
+      }
+    },
+
+    modifyUser() {
+      event.preventDefault()
+
+      console.log("modify");
+
+      const user = JSON.parse(localStorage.getItem("user"))
+
+      const formData = new FormData()
+      formData.append("function", "names")
+      formData.append("userId", user.id)
+      formData.append("token", user.token)
+      formData.append("name", this.$refs.name.value)
+      formData.append("familyName", this.$refs.familyName.value)
+      formData.append("email", this.$refs.email.value)
+
+      this.$store.dispatch('modifyUser', formData).then(() => {
+        user.name = this.$refs.name.value
+        user.familyName = this.$refs.familyName.value
+        user.email = this.$refs.email.value
+        localStorage.setItem("user", JSON.stringify(user))
+      })
+    },
+
+    showChangeAvatarBtn() {
+      let changeAvatarBtn = document.getElementById("changeAvatar")
+      let active = changeAvatarBtn.classList.contains("btn-active")
+
+      if (active === true) {
+        changeAvatarBtn.classList.remove("btn-active")
+      } else {
+        changeAvatarBtn.classList.add("btn-active")
+      }
+    },
+
+    changeAvatarPopup() {
+      let popup = document.getElementById("changeAvatarPopup")
+      let popupActive = popup.classList.contains("popup-active")
+
+      if (popupActive === false) {
+        popup.classList.add("popup-active")
+        document.querySelector("body").style.overflow = "hidden"
+      } else {
+        popup.classList.remove("popup-active")
+      }
+    },
+
+    changeAvatar() {
+      event.preventDefault()
+
+      console.log("change");
+
+      const user = JSON.parse(localStorage.getItem("user"))
+
+      const formData = new FormData()
+      formData.append("userId", user.id)
+      formData.append("token", user.token)
+      formData.append("image", this.$refs.media.files[0])
+
+      this.$store.dispatch('changeAvatar', formData)
+    },
+
+    deleteUserPopup() {
+      let popup = document.getElementById("deletePostPopup")
+      let popupActive = popup.classList.contains("popup-active")
+
+      if (popupActive === false) {
+        popup.classList.add("popup-active")
+        document.querySelector("body").style.overflow = "hidden"
+      } else {
+        popup.classList.remove("popup-active")
+      }
+    },
+
+    changePasswordPopup() {
+      let popup = document.getElementById("changePasswordPopup")
+      let popupActive = popup.classList.contains("popup-active")
+
+      if (popupActive === false) {
+        popup.classList.add("popup-active")
+        document.querySelector("body").style.overflow = "hidden"
+        document.getElementById("new").classList.remove("passInput__warning")
+        document.getElementById("new").classList.remove("passInput__success")
+        document.getElementById("confirm").classList.remove("passInput__warning")
+        document.getElementById("confirm").classList.remove("passInput__success")
+      } else {
+        popup.classList.remove("popup-active")
+      }
+    },
+
+    formVerif(e) {
+      if (e.target.attributes.id.value === "current") {
+        if (!e.target.value) {
+          e.target.classList.add("passInput__warning")
+        } else {
+          e.target.classList.remove("passInput__warning")
+        }
+      }
+      if (e.target.attributes.id.value === "new") {
+        if (!e.target.value) {
+          e.target.classList.remove("passInput__success")
+          e.target.classList.add("passInput__warning")
+        } else {
+          e.target.classList.add("passInput__success")
+          e.target.classList.remove("passInput__warning")
+        }
+      }
+      if (e.target.attributes.id.value === "confirm") {
+        if (!e.target.value ||  this.$refs.new.value != this.$refs.confirm.value) {
+          e.target.classList.remove("passInput__success")
+          e.target.classList.add("passInput__warning")
+        } else {
+          e.target.classList.add("passInput__success")
+          e.target.classList.remove("passInput__warning")
+        }
+      }
+    },
+
+    changePassword() {
+      event.preventDefault()
+
+      console.log("password");
+
+      const user = JSON.parse(localStorage.getItem("user"))
+
+      let formIsCorrect = false
+
+      if (this.$refs.current.value && this.$refs.new.value && this.$refs.confirm.value && this.$refs.new.value === this.$refs.confirm.value) {
+        formIsCorrect = true
+      }
+
+      if (formIsCorrect === true) {
+        const formData = new FormData()
+        formData.append("function", "password")
+        formData.append("userId", user.id)
+        formData.append("token", user.token)
+        formData.append("currentPassword", this.$refs.current.value)
+        formData.append("newPassword", this.$refs.new.value)
+
+        this.$store.dispatch('modifyUserPassword', formData)
+        console.log("FORM IS CORRECT AND PASSWORD IS CHANGED");
+      }
+    },
+
+    closePopup(e) {
+      event.preventDefault()
+
+      let popup = e.target.closest("div.popup")
+
+      // define which popup is active to reset some content for user and password when canceled
+
+      if (popup.attributes.id.value === "modifyUserPopup") {
+        document.getElementById("name-popup").value = ""
+        document.getElementById("familyName-popup").value = ""
+        document.getElementById("email-popup").value = ""
+      }
+
+      if (popup.attributes.id.value === "changePasswordPopup") {
+        document.getElementById("current").value = ""
+        document.getElementById("new").value = ""
+        document.getElementById("confirm").value = ""
+        document.getElementById("res").textContent = ""
+      }
+
+      popup.classList.remove("popup-active")
+      document.querySelector("body").removeAttribute("style")
+    },
+
+    deleteUser() {
+      const user = JSON.parse(localStorage.getItem("user"))
+
+      this.$store.dispatch('deleteUser', user).then(() => {
+        localStorage.clear()
+        window.location.reload()
+      })
+    }
+
+  }
 }
 
 
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 
-.userPassword {
+.userinfo {
+  display: flex;
+  flex-direction: column;
+  max-width: 800px;
+  margin: auto;
+  gap: 20px;
+}
+
+.avatar {
+  position: relative;
+}
+
+img {
+  width: 200px;
+  height: 200px;
+  border: 3px solid black;
+  border-radius: 50%;
+  margin: auto;
+}
+
+#changeAvatar {
+  position: absolute;
+  top: 90%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 145px;
+  height: 40px;
+  border: 4px solid white;
+}
+
+span {
   display: flex;
   flex-direction: column;
 }
 
-.updateAccountBtn {
-  color: blue;
+.warning {
+  color: red;
+}
+
+label {
+}
+
+input {
+  max-width: 89%;
   border-radius: 5px;
-  width: 150px;
-  height: 25px;
-  &:hover {
-    cursor: pointer;
+  text-align: center;
+}
+
+.passInput {
+  border: 2px solid black;
+  &__warning {
+    border-color: red;
+  }
+  &__success {
+    border-color: #4BB543;
   }
 }
 
-.deleteAccountBtn {
-  color: red;
-  border-radius: 5px;
-  width: 150px;
+button {
+  background-color: #1877F2;
+  color: white;
+  font-size: 15px;
+  font-weight: bold;
   height: 25px;
+  border: 0px;
+  border-radius: 7px;
   &:hover {
-    background-color: red;
-    color: white;
     cursor: pointer;
+    background-color: #3588f2;
+  }
+}
+
+.btn {
+  display: none;
+  &-active {
+    display: block;
+  }
+}
+
+#delete {
+  background-color: #f85149;
+  &:hover {
+    background-color: #ff6b63;
+  }
+}
+
+#changePasswordPopup, #modifyUserPopup, #changeAvatarPopup {
+  position: absolute;
+  top: 0;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(200, 200, 200, 0.4);
+  span {
+    display: block;
+  }
+}
+
+#modifyUserPopup {
+  span {
+    display: flex;
+    width: 80%;
+  }
+}
+
+.changePasswordPopup, .modifyUserPopup, .changeAvatarPopup {
+  position: fixed;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: 1px solid black;
+  border-radius: 20px;
+  background-color: white;
+  width: 50%;
+  height: 35%;
+  padding-bottom: 20px;
+  @media (max-width: 1000px) {
+    padding: 5px;
+    padding-bottom: 20px;
+    width: 95%;
   }
 }
 </style>

@@ -63,6 +63,10 @@ export default {
       const $postInfo = document.createElement("div")
       $postInfo.classList.add("postInfo")
 
+      const $postUserAvatar = document.createElement("img")
+      $postUserAvatar.classList.add("userAvatar")
+      $postUserAvatar.setAttribute("src", post.userAvatar)
+
       const $postAuthor = document.createElement("p")
       $postAuthor.classList.add("author")
       $postAuthor.textContent = post.authorName + " " + post.authorFamilyName
@@ -118,6 +122,7 @@ export default {
       $numberOfLikes.setAttribute("id", `like${post.id}`)
       $numberOfLikes.textContent = post.likes
 
+      $postInfo.appendChild($postUserAvatar)
       $postInfo.appendChild($postAuthor)
       $postInfo.appendChild($postDate)
 
@@ -486,9 +491,21 @@ p {
   justify-content: space-between;
 }
 
+.postInfo {
+  position: relative;
+}
+
+.userAvatar {
+  position: absolute;
+  left: 10px;
+  width: 40px;
+  height: 40px;
+  border-radius: 25px;
+}
+
 .author, .date {
   text-align: left;
-  padding: 0px 20px 0px 20px;
+  padding: 0px 20px 0px 60px;
 }
 
 .date {
@@ -555,7 +572,7 @@ ul {
   }
 }
 
-.deletePopup {
+.deletePopup, .changePasswordPopup, .modifyUserPopup, .changeAvatarPopup {
   position: fixed;
   display: flex;
   justify-content: space-around;

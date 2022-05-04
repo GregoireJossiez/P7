@@ -9,7 +9,8 @@ export default createStore({
       familyName: "",
       password: "",
       token: ""
-    }
+    },
+    passwordMessage: ""
   },
   getters: {
   },
@@ -21,6 +22,9 @@ export default createStore({
       state.user.familyName = user.familyName,
       state.user.password = user.password,
       state.user.token = user.token
+    },
+    updatePasswordMessage (state, message) {
+      state.passwordMessage = message
     }
   },
   actions: {
@@ -151,10 +155,70 @@ export default createStore({
       })
     },
 
+    // changeAvatar function
+
+    changeAvatar(context, formData) {
+      console.log(formData);
+
+      fetch(`http://localhost:3000/api/post/user/${formData.get("userId")}`, {
+        method: 'PUT',
+        body: formData,
+        headers: {
+          // 'Content-Type': 'multipart/form-data',
+          'Authorization': 'Bearer ' + formData.get("token")
+        },
+      }).then(function(response) {
+        window.location.reload()
+        return response.json({ response });
+      }).catch((err) => {
+        console.log("Problème avec fetch : " + err.message);
+      })
+    },
+
     // Modify User function
 
-    modifyUser(context, post) {
-      console.log(post);
+    modifyUser(context, formData) {
+      console.log(formData);
+
+      fetch(`http://localhost:3000/api/post/user/${formData.get("userId")}`, {
+        method: 'PUT',
+        body: formData,
+        headers: {
+          // 'Content-Type': 'multipart/form-data',
+          'Authorization': 'Bearer ' + formData.get("token")
+        },
+      }).then(function(response) {
+        window.location.reload()
+        return response.json({ response });
+      }).catch((err) => {
+        console.log("Problème avec fetch : " + err.message);
+      })
+    },
+
+    // Modify User Password function
+
+    modifyUserPassword(context, formData) {
+      console.log(formData);
+
+      fetch(`http://localhost:3000/api/post/user/${formData.get("userId")}`, {
+        method: 'PUT',
+        body: formData,
+        headers: {
+          // 'Content-Type': 'multipart/form-data',
+          'Authorization': 'Bearer ' + formData.get("token")
+        },
+      }).then(function(response) {
+        if (response.status == "401") {
+          let message = "Wrong current password"
+          context.commit("updatePasswordMessage", message)
+        }
+        if (response.status == "200") {
+          window.location.reload()
+        }
+        return response.json({ response });
+      }).catch((err) => {
+        console.log("Problème avec fetch : " + err.message);
+      })
     },
 
     // Delete User function

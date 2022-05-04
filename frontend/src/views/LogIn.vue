@@ -34,13 +34,6 @@ export default {
   },
   methods: {
     logIn() {
-      // const email = document.getElementById("Email")
-      // const password = document.getElementById("Password")
-      // const submitBtn = document.getElementById("submit");
-
-
-      // console.log("test");
-      // console.log("email : " + this.$refs.email.value + " password : " + this.$refs.password.value);
 
       const user = {
         email: this.$refs.email.value,
@@ -48,51 +41,7 @@ export default {
         token: ""
       }
 
-      // const token = {
-      //   token: ""
-      // }
-
-      // console.log(user);
-      // console.log(user.username);
-
       this.$store.dispatch('logIn', user);
-
-      // const postLogIn = async () => fetch('http://localhost:3000/api/auth/login', {
-      //   method: 'POST',
-      //   body: JSON.stringify(user),
-      //   headers: {
-      //     'Content-Type': 'application/json;charset=utf-8'
-      //   },
-      // }).then((response) => {
-      //   return response.json({ response });
-      // }).then((data) => {
-      //   let token = {
-      //     token: data.token
-      //   }
-      //   console.log(token);
-      // }).catch((err) => {
-      //   console.log("Problème avec fetch : " + err.message);
-      // })
-
-      // fetch('http://localhost:3000/api/auth/login', {
-      //   method: 'POST',
-      //   body: JSON.stringify(user),
-      //   headers: {
-      //     'Content-Type': 'application/json;charset=utf-8'
-      //   },
-      // }).then((response) => {
-      //   return response.json({ response });
-      // }).then((data) => {
-      //   let token = {
-      //     token: data.token
-      //   }
-      //   console.log(token);
-      // }).catch((err) => {
-      //   console.log("Problème avec fetch : " + err.message);
-      // })
-
-      // this.$store.dispatch('getUserInfo', user, postLogIn(), token);
-      // this.$store.dispatch('getUserInfo', user, token);
     }
   }
 }
