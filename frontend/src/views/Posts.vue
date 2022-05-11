@@ -22,9 +22,6 @@
       <button @click="deletePost" class="deletePopup-btn deletePopup-btn__delete" type="button" name="delete">Delete</button>
     </div>
   </div>
-  <div class="home">
-    <img alt="Vue logo" src="../assets/logo.png">
-  </div>
   <div id="Posts">
     <h1>Most recents posts</h1>
   </div>
@@ -71,9 +68,13 @@ export default {
       $postAuthor.classList.add("author")
       $postAuthor.textContent = post.authorName + " " + post.authorFamilyName
 
+      var created = Date.parse(post.createdAt);
+      var now = new Date().getTime();
+      var howLongAgo = created - now
+
       const $postDate = document.createElement("p")
       $postDate.classList.add("date")
-      $postDate.textContent = post.createdAt
+      $postDate.textContent = getHumanTime(howLongAgo)
 
       const $postSettings = document.createElement("div")
       $postSettings.classList.add("postSettings")
@@ -126,11 +127,11 @@ export default {
       $postInfo.appendChild($postAuthor)
       $postInfo.appendChild($postDate)
 
-      if (post.userId === user.id) {
+      if (post.userId === user.id || user.admin) {
         $settingsMenu.appendChild($modify)
         $settingsMenu.appendChild($delete)
       }
-      $settingsMenu.appendChild($report)
+      // $settingsMenu.appendChild($report)
 
       $postSettingsMenu.appendChild($settingsMenu)
 
@@ -159,6 +160,61 @@ export default {
       $post.appendChild($postReaction)
 
       return $post
+    }
+
+    // Calculate relative time
+
+    const getHumanTime = (timestamp) => {
+
+      // Convert to integer
+      var time = Math.abs(timestamp)
+
+      // Define humanTime and units
+      var humanTime, units;
+
+      // If there are years
+      if (time > (1000 * 60 * 60 * 24 * 365)) {
+        humanTime = parseInt(time / (1000 * 60 * 60 * 24 * 365), 10)
+        units = 'years'
+      }
+
+      // If there are months
+      else if (time > (1000 * 60 * 60 * 24 * 30)) {
+        humanTime = parseInt(time / (1000 * 60 * 60 * 24 * 30), 10)
+        units = 'months'
+      }
+
+      // If there are weeks
+      else if (time > (1000 * 60 * 60 * 24 * 7)) {
+        humanTime = parseInt(time / (1000 * 60 * 60 * 24 * 7), 10)
+        units = 'weeks'
+      }
+
+      // If there are days
+      else if (time > (1000 * 60 * 60 * 24)) {
+        humanTime = parseInt(time / (1000 * 60 * 60 * 24), 10)
+        units = 'days'
+      }
+
+      // If there are hours
+      else if (time > (1000 * 60 * 60)) {
+        humanTime = parseInt(time / (1000 * 60 * 60), 10)
+        units = 'hours'
+      }
+
+      // If there are minutes
+      else if (time > (1000 * 60)) {
+        humanTime = parseInt(time / (1000 * 60), 10)
+        units = 'minutes'
+      }
+
+      // If there are seconds
+      else if (time > (1000)) {
+        humanTime = parseInt(time / (1000), 10)
+        units = 'seconds'
+      }
+
+      return humanTime + ' ' + units + ' ' + 'ago'
     }
 
     // Add likes function
@@ -335,6 +391,8 @@ export default {
       document.getElementById("img").removeAttribute("removed")
       document.querySelector("body").removeAttribute("style")
 
+      // Modify post content to avoid refreshing the page
+
       let post = document.querySelector(`div.post[postid='${postid}']`)
       let postContent = post.querySelector(".content p")
 
@@ -358,13 +416,13 @@ export default {
         console.log("IMAGE");
         if (imgRemoved) {
           if (this.$refs.media.files[0]) {
-            postContent.querySelector("img").attributes.srv.value = URL.createObjectURL(this.$refs.media.files[0])
+            postContent.querySelector("img").attributes.src.value = URL.createObjectURL(this.$refs.media.files[0])
           } else {
             postContent.querySelector("img").remove()
           }
         }
         if (this.$refs.media.files[0]) {
-          postContent.querySelector("img").attributes.srv.value = URL.createObjectURL(this.$refs.media.files[0])
+          postContent.querySelector("img").attributes.src.value = URL.createObjectURL(this.$refs.media.files[0])
         }
       }
 
@@ -449,7 +507,7 @@ textarea {
 button {
 }
 
-#submit, #cancel {
+#submit, #cancel, #avatarLabel {
   background-color: #1877F2;
   color: white;
   font-size: 15px;

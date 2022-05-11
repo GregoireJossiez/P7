@@ -2,9 +2,20 @@
   <div id="changeAvatarPopup" class="popup">
     <div class="changeAvatarPopup">
       <button id="close" @click="closePopup">&times;</button>
-      <span class="avatar">
+      <span class="avatarPreview">
         <label for="media">Upload avatar</label>
-        <input ref="media" id="media" type="file" name="media" value="">
+        <vue-cropper v-if="imgSrc != ''"
+          ref="cropper"
+          :view-mode="3"
+          :auto-crop-area="1"
+          :aspect-ratio="4 / 4"
+          :src="imgSrc"
+          :style="{ width: '200px', height: '200px', margin: 'auto' }"
+          :img-style="{ width: '', height: '200px' }"
+          preview=".preview"
+        />
+        <label id="avatarLabel" for="media">Choose a file</label>
+        <input @change="avatarPreview" ref="media" id="media" type="file" name="media" value="" style="display: none;">
       </span>
       <button id="cancel" @click="closePopup" class="changePasswordPopup-btn changePasswordPopup-btn__cancel" type="button" name="cancel">Cancel</button>
       <button id="submit" @click="changeAvatar" class="changePasswordPopup-btn changePasswordPopup-btn__delete" type="button" name="submit">Modify</button>
@@ -87,9 +98,21 @@
 
 <script>
 
+import VueCropper from 'vue-cropperjs';
+import 'cropperjs/dist/cropper.css';
+
 export default {
+  data() {
+    return {
+      imgSrc: '',
+      cropImg: '',
+      data: null,
+    }
+  },
 
   mounted() {
+
+    document.title = "Settings"
 
     const user = JSON.parse(localStorage.getItem("user"))
 
@@ -198,19 +221,59 @@ export default {
       }
     },
 
+    avatarPreview() {
+
+      console.log(this.$refs.media.files[0].name);
+      // document.getElementById("avatarPreview").attributes.src.value = URL.createObjectURL(this.$refs.media.files[0])
+
+      if (this.imgSrc) {
+        this.imgSrc = ""
+        this.imgSrc = URL.createObjectURL(this.$refs.media.files[0])
+      } else {
+        this.imgSrc = URL.createObjectURL(this.$refs.media.files[0])
+      }
+    },
+
     changeAvatar() {
       event.preventDefault()
 
       console.log("change");
 
-      const user = JSON.parse(localStorage.getItem("user"))
+      function dataURLtoFile(dataurl, filename) {
 
-      const formData = new FormData()
-      formData.append("userId", user.id)
-      formData.append("token", user.token)
-      formData.append("image", this.$refs.media.files[0])
+       var arr = dataurl.split(','),
+       mime = arr[0].match(/:(.*?);/)[1],
+       bstr = atob(arr[1]),
+       n = bstr.length,
+       u8arr = new Uint8Array(n);
 
-      this.$store.dispatch('changeAvatar', formData)
+       while(n--){
+           u8arr[n] = bstr.charCodeAt(n);
+       }
+
+       return new File([u8arr], filename, {type:mime});
+      }
+
+      if (!this.$refs.media.files[0]) {
+        console.log("No file selected");
+      } else {
+        let base64 = this.$refs.cropper.getCroppedCanvas().toDataURL()
+        let filename = this.$refs.media.files[0].name
+
+        //Usage example:
+        var file = dataURLtoFile(base64, filename);
+        console.log(file);
+
+        const user = JSON.parse(localStorage.getItem("user"))
+
+        const formData = new FormData()
+        formData.append("userId", user.id)
+        formData.append("token", user.token)
+        // formData.append("image", this.$refs.media.files[0])
+        formData.append("image", file)
+
+        this.$store.dispatch('changeAvatar', formData)
+      }
     },
 
     deleteUserPopup() {
@@ -315,6 +378,12 @@ export default {
         document.getElementById("res").textContent = ""
       }
 
+      if (popup.attributes.id.value === "changeAvatarPopup") {
+        // document.getElementById("avatarPreview").attributes.src.value = ""
+        document.getElementById("media").value = ""
+        this.imgSrc = ""
+      }
+
       popup.classList.remove("popup-active")
       document.querySelector("body").removeAttribute("style")
     },
@@ -327,7 +396,10 @@ export default {
         window.location.reload()
       })
     }
+  },
 
+  components: {
+    VueCropper
   }
 }
 
@@ -348,11 +420,16 @@ export default {
   position: relative;
 }
 
-img {
+#userAvatar {
   width: 200px;
   height: 200px;
   border: 3px solid black;
   border-radius: 50%;
+  margin: auto;
+}
+
+#avatarPreview {
+  height: 200px;
   margin: auto;
 }
 
@@ -434,6 +511,13 @@ button {
   }
 }
 
+#changeAvatarPopup {
+  .avatarPreview {
+    display: flex;
+    gap: 20px;
+  }
+}
+
 #modifyUserPopup {
   span {
     display: flex;
@@ -456,6 +540,18 @@ button {
     padding: 5px;
     padding-bottom: 20px;
     width: 95%;
+  }
+}
+
+.changeAvatarPopup {
+  height: 50%;
+}
+
+#avatarLabel {
+  width: 200px;
+  background-color: #545454;
+  &:hover {
+    background-color: #808080;
   }
 }
 </style>

@@ -23,6 +23,10 @@ const User = sequelize.define('user', {
   avatar: {
     type: Sequelize.DataTypes.STRING,
     defaultValue: "http://localhost:3000/images/default-avatar-1.jpeg"
+  },
+  admin: {
+    type: Sequelize.DataTypes.BOOLEAN,
+    defaultValue: false
   }
   }, {
   // Other model options go here

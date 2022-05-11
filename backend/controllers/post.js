@@ -291,31 +291,17 @@ exports.deletePost = (req, res, next) => {
           error: new Error("Objet non trouvé")
         })
       }
-      if (post.userId !== req.auth.userId) {
-        return res.status(401).json({
-          error: new Error("Requête non autorisée")
-        })
+      if (!req.admin) {
+        if (post.userId !== req.auth.userId) {
+          return res.status(401).json({
+            error: new Error("Requête non autorisée")
+          })
+        }
       }
       if (post.imageUrl != null) {
         const filename = post.imageUrl.split("/images/")[1]
         fs.unlink(`images/${filename}`, () => {
-          // Post.findOne({ where: { id: req.params.id }}).then(
-          //   (post) => {
-          //     if (!post) {
-          //       return res.status(404).json({
-          //         error: new Error("Objet non trouvé")
-          //       })
-          //     }
-          //     if (post.userId !== req.auth.userId) {
-          //       return res.status(401).json({
-          //         error: new Error("Requête non autorisée")
-          //       })
-          //     }
-          //     Post.destroy({ where: { id: req.params.id }})
-          //     .then(() => res.status(200).json({message: "Objet supprimé"}))
-          //     .catch(error => res.status(400).json({ error }))
-          //   }
-          // )
+
         })
       }
       Post.destroy({ where: { id: req.params.id }})

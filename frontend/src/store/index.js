@@ -8,7 +8,8 @@ export default createStore({
       name: "",
       familyName: "",
       password: "",
-      token: ""
+      token: "",
+      admin: ""
     },
     passwordMessage: ""
   },
@@ -22,6 +23,7 @@ export default createStore({
       state.user.familyName = user.familyName,
       state.user.password = user.password,
       state.user.token = user.token
+      state.user.admin = user.admin
     },
     updatePasswordMessage (state, message) {
       state.passwordMessage = message
@@ -47,6 +49,7 @@ export default createStore({
         user.name = data.name
         user.familyName = data.familyName
         user.token = data.token
+        user.admin = data.admin
 
         localStorage.setItem("user", JSON.stringify(user))
         context.commit("updateUser", user)
