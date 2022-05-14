@@ -42,17 +42,34 @@ export default createStore({
           'Content-Type': 'application/json;charset=utf-8'
         },
       }).then((response) => {
+        if (response.status == '200') {
+          let redirect = () => {
+            window.location.href = '/#';
+          }
+
+          let message = ""
+          context.commit("updatePasswordMessage", message)
+
+          window.setTimeout(redirect, 100)
+        }
+        if (response.status == '401') {
+          let message = "Wrong email or password"
+          context.commit("updatePasswordMessage", message)
+        }
          return response.json({ response });
       }).then((data) => {
-        console.log(data);
-        user.id = data.userId
-        user.name = data.name
-        user.familyName = data.familyName
-        user.token = data.token
-        user.admin = data.admin
+        if (data.error) {
+          console.log(data);
+        } else {
+          user.id = data.userId
+          user.name = data.name
+          user.familyName = data.familyName
+          user.token = data.token
+          user.admin = data.admin
 
-        localStorage.setItem("user", JSON.stringify(user))
-        context.commit("updateUser", user)
+          localStorage.setItem("user", JSON.stringify(user))
+          context.commit("updateUser", user)
+        }
       }).catch((err) => {
         console.log("Problème avec fetch : " + err.message);
       })
@@ -69,7 +86,30 @@ export default createStore({
           'Content-Type': 'application/json;charset=utf-8'
         },
       }).then(function(response) {
+        if (response.status == '200') {
+          let redirect = () => {
+            window.location.href = '/#';
+          }
+
+          let message = ""
+          context.commit("updatePasswordMessage", message)
+
+          window.setTimeout(redirect, 100)
+        }
         return response.json({ response });
+      }).then((data) => {
+        if (data.error) {
+          console.log(data);
+        } else {
+          user.id = data.userId
+          user.name = data.name
+          user.familyName = data.familyName
+          user.token = data.token
+          user.admin = data.admin
+
+          localStorage.setItem("user", JSON.stringify(user))
+          context.commit("updateUser", user)
+        }
       }).catch((err) => {
         console.log("Problème avec fetch : " + err.message);
       })
@@ -95,6 +135,10 @@ export default createStore({
           'Authorization': 'Bearer ' + formData.get("token")
         },
       }).then(function(response) {
+        let reload = () => {
+          window.location.reload()
+        }
+        window.setTimeout(reload, 100)
         return response.json({ response });
       }).catch((err) => {
         console.log("Problème avec fetch : " + err.message);
@@ -216,6 +260,8 @@ export default createStore({
           context.commit("updatePasswordMessage", message)
         }
         if (response.status == "200") {
+          let message = ""
+          context.commit("updatePasswordMessage", message)
           window.location.reload()
         }
         return response.json({ response });
@@ -236,6 +282,13 @@ export default createStore({
           'Authorization': 'Bearer ' + user.token
         },
       }).then(function(response) {
+        if (response.status == '200') {
+          let redirect = () => {
+            window.location.href = '/#/login';
+          }
+
+          window.setTimeout(redirect, 100)
+        }
         return response.json({ response });
       }).catch((err) => {
         console.log("Problème avec fetch : " + err.message);

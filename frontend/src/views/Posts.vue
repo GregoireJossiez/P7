@@ -1,16 +1,17 @@
 <template>
+  <Nav/>
   <div id="modifyPostPopup" class="popup modify">
     <form class="" action="" method="" enctype="multipart/form-data">
       <div class="form form-modify">
         <button id="close" @click="closeModify">&times;</button>
         <label for="post">Modify your post</label>
-        <textarea ref="post" id="post" postid="" name="Post" rows="8" cols="80" value=""></textarea>
+        <textarea ref="postModify" id="post" postid="" name="Post" rows="8" cols="80" value=""></textarea>
         <div class="img-container">
           <img id="img" src="" alt="">
           <button id="delete" class="delete" @click="removeImg">Remove</button>
         </div>
-        <input ref="media" id="media" type="file" name="media">
-        <button id="submit" @click="post">Modify post</button>
+        <input ref="media" id="media" type="file" name="media" accept="image/png, image/jpeg, image/jpg, image/gif">
+        <button id="submit" @click="modifyPost">Modify post</button>
       </div>
     </form>
   </div>
@@ -23,24 +24,52 @@
     </div>
   </div>
   <div id="Posts">
-    <h1>Most recents posts</h1>
+    <!-- <h1>Most recents posts</h1> -->
+    <div id="newPost" class="post">
+      <form class="" action="" method="" enctype="multipart/form-data">
+        <div class="form">
+          <button id="close" class="disabled" @click="clearNewPost">&times;</button>
+          <textarea @input="textListener" class="emptyForm" ref="postNewPost" placeholder="Create a new post" id="postNewPost" name="Post" rows="8" cols="80"></textarea>
+          <img :src="imgPreview" alt="">
+          <label id="mediaLabel" for="mediaNewPost">Choose image</label>
+          <input @change="changeImgPreview" ref="mediaNewPost" id="mediaNewPost" type="file" name="media" value="" accept="image/png, image/jpeg, image/jpg, image/gif" style="display: none;">
+          <button id="submit" class="disabled" @click="post">Post</button>
+        </div>
+      </form>
+    </div>
   </div>
 </template>
 
 <script>
 // @ is an alias to /src
 
+import Nav from './../components/NavItem'
+
 export default {
+  data() {
+    return {
+      imgPreview: ''
+    }
+  },
+
   name: 'HomeView',
   components: {
-
+    Nav
   },
   mounted() {
-    // const token = this.$store.state.user.token
+    document.title = "Groupomania - Home"
 
     // Retrieving user data in the localStorage
 
     const user = JSON.parse(localStorage.getItem("user"))
+
+    // Redirect if user is not logged
+
+    if (!user) {
+      window.location.href = '/#/login';
+      return
+    }
+
     const token = user.token
 
     const $posts = document.getElementById("Posts")
@@ -130,12 +159,10 @@ export default {
       if (post.userId === user.id || user.admin) {
         $settingsMenu.appendChild($modify)
         $settingsMenu.appendChild($delete)
+        $postSettingsMenu.appendChild($settingsMenu)
+        $postSettings.appendChild($postSettingsMenu)
       }
-      // $settingsMenu.appendChild($report)
 
-      $postSettingsMenu.appendChild($settingsMenu)
-
-      $postSettings.appendChild($postSettingsMenu)
 
       $postTop.appendChild($postInfo)
       $postTop.appendChild($postSettings)
@@ -357,7 +384,74 @@ export default {
     main()
   },
   methods: {
-    post(e) {
+    post() {
+
+      // Retrieving user data in the localStorage
+
+      const user = JSON.parse(localStorage.getItem("user"))
+
+      const formData = new FormData()
+      formData.append("user", user)
+      formData.append("userId", user.id)
+      formData.append("name", user.name)
+      formData.append("familyName", user.familyName)
+      formData.append("token", user.token)
+      formData.append("content", this.$refs.postNewPost.value)
+      formData.append("image", this.$refs.mediaNewPost.files[0])
+
+      // Calling the function in the $store
+
+      event.preventDefault()
+      console.log(this.$refs.mediaNewPost.files[0]);
+      this.$store.dispatch('newPost', formData);
+      // window.location.reload()
+    },
+
+    textListener(e) {
+
+      const closeBtn = document.querySelector("#newPost form div.form #close")
+      const textArea = document.querySelector("#newPost form div.form #postNewPost")
+      const postBtn = document.querySelector("#newPost form div.form #submit")
+
+      if (e.target.value) {
+        closeBtn.classList.remove("disabled")
+        postBtn.classList.remove("disabled")
+        textArea.classList.remove("emptyForm")
+      } else {
+        closeBtn.classList.add("disabled")
+        postBtn.classList.add("disabled")
+        textArea.classList.add("emptyForm")
+      }
+    },
+
+    changeImgPreview() {
+
+      console.log(this.$refs.mediaNewPost.files[0].name);
+      // document.getElementById("avatarPreview").attributes.src.value = URL.createObjectURL(this.$refs.media.files[0])
+
+      if (this.imgPreview) {
+        this.imgPreview = ""
+        this.imgPreview = URL.createObjectURL(this.$refs.mediaNewPost.files[0])
+      } else {
+        this.imgPreview = URL.createObjectURL(this.$refs.mediaNewPost.files[0])
+      }
+
+      const closeBtn = document.querySelector("#newPost form div.form #close")
+      const textArea = document.querySelector("#newPost form div.form #postNewPost")
+      const postBtn = document.querySelector("#newPost form div.form #submit")
+
+      if (this.$refs.mediaNewPost.files[0].name) {
+        closeBtn.classList.remove("disabled")
+        postBtn.classList.remove("disabled")
+        textArea.classList.remove("emptyForm")
+      } else {
+        closeBtn.classList.add("disabled")
+        postBtn.classList.add("disabled")
+        textArea.classList.add("emptyForm")
+      }
+    },
+
+    modifyPost(e) {
       event.preventDefault()
       let postid = document.getElementById("post").attributes.postid.value
       let popup = e.target.closest("div.popup")
@@ -372,7 +466,7 @@ export default {
       formData.append("name", user.name)
       formData.append("familyName", user.familyName)
       formData.append("token", user.token)
-      formData.append("content", this.$refs.post.value)
+      formData.append("content", this.$refs.postModify.value)
       if (imgRemoved) {
         let img = document.querySelector(`div[postid='${postid}'] div.content p img`)
         let imageUrl = img.attributes.src.value
@@ -396,8 +490,8 @@ export default {
       let post = document.querySelector(`div.post[postid='${postid}']`)
       let postContent = post.querySelector(".content p")
 
-      if (this.$refs.post.value) {
-        postContent.textContent = this.$refs.post.value
+      if (this.$refs.postModify.value) {
+        postContent.textContent = this.$refs.postModify.value
       }
 
       if (!postContent.querySelector("img")) {
@@ -478,6 +572,22 @@ export default {
       document.querySelector("body").removeAttribute("style")
     },
 
+    clearNewPost() {
+      event.preventDefault()
+
+      const textArea = document.querySelector("#newPost form div.form textarea")
+      const inputFile = document.querySelector("#newPost form div.form input")
+      const closeBtn = document.querySelector("#newPost form div.form #close")
+      const postBtn = document.querySelector("#newPost form div.form #submit")
+
+      textArea.value = ""
+      this.imgPreview = ""
+      inputFile.value = ""
+      closeBtn.classList.add("disabled")
+      postBtn.classList.add("disabled")
+      textArea.classList.add("emptyForm")
+    },
+
     removeImg() {
       event.preventDefault()
       console.log("remove");
@@ -502,12 +612,15 @@ textarea, button, input {
 
 textarea {
   resize: none;
+  border-radius: 15px;
+  padding: 5px;
+  padding-bottom: 10px;
 }
 
 button {
 }
 
-#submit, #cancel, #avatarLabel {
+#submit, #cancel, #avatarLabel, #mediaLabel {
   background-color: #1877F2;
   color: white;
   font-size: 15px;
@@ -519,6 +632,12 @@ button {
     cursor: pointer;
     background-color: #3588f2;
   }
+  &:disabled {
+    background-color: grey;
+    &:hover {
+     cursor: default;
+   }
+  }
 }
 
 p {
@@ -526,12 +645,37 @@ p {
   padding: 0px;
 }
 
-#Posts {
+#Posts  {
   margin: auto;
   display: flex;
   flex-direction: column;
   gap: 10px;
   max-width: 1000px;
+}
+
+#newPost {
+  position: relative;
+  .form {
+    margin: auto;
+    width: 85%;
+  }
+  .emptyForm {
+    height: 10px;
+    background-color: white;
+    &:focus {
+      height: auto;
+      &:hover {
+        background-color: white;
+      }
+    }
+    &:hover {
+      background-color: #E2E2E2;
+    }
+  }
+  #mediaLabel {
+    margin: auto;
+    width: 200px;
+  }
 }
 
 .post {
@@ -738,6 +882,10 @@ ul {
     cursor: pointer;
     background-color: grey;
   }
+}
+
+.disabled {
+  display: none;
 }
 
 .modify {

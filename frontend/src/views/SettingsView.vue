@@ -1,4 +1,5 @@
 <template>
+  <Nav/>
   <div id="changeAvatarPopup" class="popup">
     <div class="changeAvatarPopup">
       <button id="close" @click="closePopup">&times;</button>
@@ -15,7 +16,7 @@
           preview=".preview"
         />
         <label id="avatarLabel" for="media">Choose a file</label>
-        <input @change="avatarPreview" ref="media" id="media" type="file" name="media" value="" style="display: none;">
+        <input @change="avatarPreview" ref="media" id="media" type="file" name="media" value="" accept="image/png, image/jpeg, image/jpg, image/gif" style="display: none;">
       </span>
       <button id="cancel" @click="closePopup" class="changePasswordPopup-btn changePasswordPopup-btn__cancel" type="button" name="cancel">Cancel</button>
       <button id="submit" @click="changeAvatar" class="changePasswordPopup-btn changePasswordPopup-btn__delete" type="button" name="submit">Modify</button>
@@ -32,7 +33,8 @@
         <input id="familyName-popup" ref="familyName" type="text" name="" value="" required>
 
         <label for="email-popup">Email : </label>
-        <input id="email-popup" ref="email" type="email" name="" value="" required>
+        <input id="email-popup" @focusout="formVerif" ref="email" type="email" name="" value="" required>
+        <p id="email-popupErrorMsg" class="warning disabled">{{ this.formErrorMsg }}</p>
       </span>
       <button id="cancel" @click="closePopup" class="changePasswordPopup-btn changePasswordPopup-btn__cancel" type="button" name="cancel">Cancel</button>
       <button id="submit" @click="modifyUser" class="changePasswordPopup-btn changePasswordPopup-btn__delete" type="button" name="submit">Modify</button>
@@ -71,7 +73,6 @@
     </div>
   </div>
   <div id="settings">
-    <h1>User settings</h1>
     <div id="userinfo" class="userinfo">
       <div class="avatar">
         <img id="userAvatar" @mouseover="showChangeAvatarBtn" @mouseleave="showChangeAvatarBtn" src="" alt="">
@@ -100,6 +101,7 @@
 
 import VueCropper from 'vue-cropperjs';
 import 'cropperjs/dist/cropper.css';
+import Nav from './../components/NavItem'
 
 export default {
   data() {
@@ -107,14 +109,21 @@ export default {
       imgSrc: '',
       cropImg: '',
       data: null,
+      formErrorMsg: ''
     }
   },
 
   mounted() {
 
-    document.title = "Settings"
+    document.title = "Groupomania - Settings"
 
     const user = JSON.parse(localStorage.getItem("user"))
+
+    // Redirect if user is not logged
+
+    if (!user) {
+      window.location.href = '/#/login';
+    }
 
     // const $settings = document.getElementById("settings")
 
@@ -177,25 +186,28 @@ export default {
 
     modifyUser() {
       event.preventDefault()
+      const emailRegEx = /[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/g
 
-      console.log("modify");
+      if (this.$refs.email.value.match(emailRegEx)) {
+        console.log("modify");
 
-      const user = JSON.parse(localStorage.getItem("user"))
+        const user = JSON.parse(localStorage.getItem("user"))
 
-      const formData = new FormData()
-      formData.append("function", "names")
-      formData.append("userId", user.id)
-      formData.append("token", user.token)
-      formData.append("name", this.$refs.name.value)
-      formData.append("familyName", this.$refs.familyName.value)
-      formData.append("email", this.$refs.email.value)
+        const formData = new FormData()
+        formData.append("function", "names")
+        formData.append("userId", user.id)
+        formData.append("token", user.token)
+        formData.append("name", this.$refs.name.value)
+        formData.append("familyName", this.$refs.familyName.value)
+        formData.append("email", this.$refs.email.value)
 
-      this.$store.dispatch('modifyUser', formData).then(() => {
-        user.name = this.$refs.name.value
-        user.familyName = this.$refs.familyName.value
-        user.email = this.$refs.email.value
-        localStorage.setItem("user", JSON.stringify(user))
-      })
+        this.$store.dispatch('modifyUser', formData).then(() => {
+          user.name = this.$refs.name.value
+          user.familyName = this.$refs.familyName.value
+          user.email = this.$refs.email.value
+          localStorage.setItem("user", JSON.stringify(user))
+        })
+      }
     },
 
     showChangeAvatarBtn() {
@@ -305,6 +317,24 @@ export default {
     },
 
     formVerif(e) {
+      const emailRegEx = /[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/g
+      const input = e.target.attributes.id.value
+      const errorMsg = document.getElementById(`${input}ErrorMsg`)
+
+      if (e.target.attributes.id.value === "email-popup") {
+        if (!e.target.value) {
+          e.target.classList.add("passInput__warning")
+        } else if (this.$refs.email.value.match(emailRegEx) === null) {
+          e.target.classList.add("passInput__warning")
+          errorMsg.classList.remove("disabled")
+          this.formErrorMsg = 'Must be an email'
+        } else {
+          e.target.classList.remove("passInput__warning")
+          errorMsg.classList.add("disabled")
+          this.formErrorMsg = ''
+        }
+      }
+
       if (e.target.attributes.id.value === "current") {
         if (!e.target.value) {
           e.target.classList.add("passInput__warning")
@@ -393,13 +423,13 @@ export default {
 
       this.$store.dispatch('deleteUser', user).then(() => {
         localStorage.clear()
-        window.location.reload()
       })
     }
   },
 
   components: {
-    VueCropper
+    VueCropper,
+    Nav
   }
 }
 
@@ -408,10 +438,21 @@ export default {
 
 <style lang="scss" scoped>
 
+#settings {
+  margin-top: 10px;
+  position: relative;
+  height: 80vh;
+}
+
 .userinfo {
+  position: absolute;
   display: flex;
   flex-direction: column;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
   max-width: 800px;
+  width: 100%;
   margin: auto;
   gap: 20px;
 }
