@@ -63,6 +63,14 @@ export default {
         document.getElementById("signin").classList.remove("switch--btn__right--active")
         document.getElementById("loginForm").classList.remove("form--hidden")
         document.getElementById("signinForm").classList.add("form--hidden")
+        const errorMsg = document.getElementById(`EmailLoginErrorMsg`)
+        errorMsg.classList.add("disabled")
+        this.formErrorMsg = ''
+        let inputs = document.querySelectorAll("input")
+        inputs.forEach((input) => {
+          input.classList.remove("formInput__warning")
+          input.value = ""
+        });
         this.$refs.emailLogin.focus()
       }
 
@@ -71,6 +79,14 @@ export default {
         document.getElementById("login").classList.remove("switch--btn__left--active")
         document.getElementById("signinForm").classList.remove("form--hidden")
         document.getElementById("loginForm").classList.add("form--hidden")
+        const errorMsg = document.getElementById(`EmailSigninErrorMsg`)
+        errorMsg.classList.add("disabled")
+        this.formErrorMsg = ''
+        let inputs = document.querySelectorAll("input")
+        inputs.forEach((input) => {
+          input.classList.remove("formInput__warning")
+          input.value = ""
+        });
         this.$refs.emailSignin.focus()
       }
     },
@@ -97,12 +113,8 @@ export default {
       if (e.target.attributes.id.value === "PasswordLogin") {
         if (!e.target.value) {
           e.target.classList.add("formInput__warning")
-          errorMsg.classList.remove("disabled")
-          this.formErrorMsg = 'Field required'
         } else {
           e.target.classList.remove("formInput__warning")
-          errorMsg.classList.add("disabled")
-          this.formErrorMsg = ''
         }
       }
 
@@ -123,36 +135,24 @@ export default {
       if (e.target.attributes.id.value === "NameSignin") {
         if (!e.target.value) {
           e.target.classList.add("formInput__warning")
-          errorMsg.classList.remove("disabled")
-          this.formErrorMsg = 'Field required'
         } else {
           e.target.classList.remove("formInput__warning")
-          errorMsg.classList.add("disabled")
-          this.formErrorMsg = ''
         }
       }
 
       if (e.target.attributes.id.value === "familyNameSignin") {
         if (!e.target.value) {
           e.target.classList.add("formInput__warning")
-          errorMsg.classList.remove("disabled")
-          this.formErrorMsg = 'Field required'
         } else {
           e.target.classList.remove("formInput__warning")
-          errorMsg.classList.add("disabled")
-          this.formErrorMsg = ''
         }
       }
 
       if (e.target.attributes.id.value === "PasswordSignin") {
         if (!e.target.value) {
           e.target.classList.add("formInput__warning")
-          errorMsg.classList.remove("disabled")
-          this.formErrorMsg = 'Field required'
         } else {
           e.target.classList.remove("formInput__warning")
-          errorMsg.classList.add("disabled")
-          this.formErrorMsg = ''
         }
       }
     },

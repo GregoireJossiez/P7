@@ -17,6 +17,7 @@
         />
         <label id="avatarLabel" for="media">Choose a file</label>
         <input @change="avatarPreview" ref="media" id="media" type="file" name="media" value="" accept="image/png, image/jpeg, image/jpg, image/gif" style="display: none;">
+        <p id="mediaErrorMsg" class="warning disabled">{{ this.formErrorMsg }}</p>
       </span>
       <button id="cancel" @click="closePopup" class="changePasswordPopup-btn changePasswordPopup-btn__cancel" type="button" name="cancel">Cancel</button>
       <button id="submit" @click="changeAvatar" class="changePasswordPopup-btn changePasswordPopup-btn__delete" type="button" name="submit">Modify</button>
@@ -268,7 +269,11 @@ export default {
 
       if (!this.$refs.media.files[0]) {
         console.log("No file selected");
+        document.getElementById("mediaErrorMsg").classList.remove("disabled")
+        this.formErrorMsg = "No file selected"
       } else {
+        document.getElementById("mediaErrorMsg").classList.add("disabled")
+        this.formErrorMsg = ""
         let base64 = this.$refs.cropper.getCroppedCanvas().toDataURL()
         let filename = this.$refs.media.files[0].name
 
@@ -392,6 +397,7 @@ export default {
       event.preventDefault()
 
       let popup = e.target.closest("div.popup")
+      this.formErrorMsg = ""
 
       // define which popup is active to reset some content for user and password when canceled
 
