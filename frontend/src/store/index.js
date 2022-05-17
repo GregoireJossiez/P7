@@ -283,6 +283,7 @@ export default createStore({
         },
       }).then(function(response) {
         if (response.status == '200') {
+          localStorage.clear()
           let redirect = () => {
             window.location.href = '/#/login';
           }

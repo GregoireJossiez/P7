@@ -1,39 +1,39 @@
 <template>
   <Nav/>
   <div id="modifyPostPopup" class="popup modify">
-    <form class="" action="" method="" enctype="multipart/form-data">
+    <form enctype="multipart/form-data">
       <div class="form form-modify">
-        <button id="close" @click="closeModify">&times;</button>
+        <button class="close" @click="closeModify">&times;</button>
         <label for="post">Modify your post</label>
-        <textarea ref="postModify" id="post" postid="" name="Post" rows="8" cols="80" value=""></textarea>
+        <textarea ref="postModify" id="post" data-postid="" name="Post" rows="8" cols="80" value=""></textarea>
         <div class="img-container">
           <img id="img" src="" alt="">
           <button id="delete" class="delete" @click="removeImg">Remove</button>
         </div>
         <input ref="media" id="media" type="file" name="media" accept="image/png, image/jpeg, image/jpg, image/gif">
-        <button id="submit" @click="modifyPost">Modify post</button>
+        <button class="submit" @click="modifyPost">Modify post</button>
       </div>
     </form>
   </div>
-  <div id="deletePostPopup" postid="" class="popup">
+  <div id="deletePostPopup" data-postid="" class="popup">
     <div class="deletePopup">
-      <button id="close" @click="closeDelete">&times;</button>
+      <button class="close" @click="closeDelete">&times;</button>
       <p class="deletePopup-txt">Are you sure you want to delete this post ?</p>
-      <button id="cancel" @click="closeDelete" class="deletePopup-btn deletePopup-btn__cancel" type="button" name="cancel">Cancel</button>
+      <button @click="closeDelete" class="cancel deletePopup-btn deletePopup-btn__cancel" type="button" name="cancel">Cancel</button>
       <button @click="deletePost" class="deletePopup-btn deletePopup-btn__delete" type="button" name="delete">Delete</button>
     </div>
   </div>
   <div id="Posts">
     <!-- <h1>Most recents posts</h1> -->
     <div id="newPost" class="post">
-      <form class="" action="" method="" enctype="multipart/form-data">
+      <form enctype="multipart/form-data">
         <div class="form">
-          <button id="close" class="disabled" @click="clearNewPost">&times;</button>
+          <button class="close disabled" @click="clearNewPost">&times;</button>
           <textarea @input="textListener" class="emptyForm" ref="postNewPost" placeholder="Create a new post" id="postNewPost" name="Post" rows="8" cols="80"></textarea>
           <img :src="imgPreview" alt="">
           <label id="mediaLabel" for="mediaNewPost">Choose image</label>
           <input @change="changeImgPreview" ref="mediaNewPost" id="mediaNewPost" type="file" name="media" value="" accept="image/png, image/jpeg, image/jpg, image/gif" style="display: none;">
-          <button id="submit" class="disabled" @click="post">Post</button>
+          <button class="submit disabled" @click="post">Post</button>
         </div>
       </form>
     </div>
@@ -80,7 +80,7 @@ export default {
 
       const $post = document.createElement("div")
       $post.classList.add("post")
-      $post.setAttribute("postId", post.id)
+      $post.setAttribute("data-postId", post.id)
       // $post.setAttribute("data-v-6837beee", "")
 
       const $postTop = document.createElement("div")
@@ -92,6 +92,7 @@ export default {
       const $postUserAvatar = document.createElement("img")
       $postUserAvatar.classList.add("userAvatar")
       $postUserAvatar.setAttribute("src", post.userAvatar)
+      $postUserAvatar.setAttribute("alt", "User avatar")
 
       const $postAuthor = document.createElement("p")
       $postAuthor.classList.add("author")
@@ -108,7 +109,7 @@ export default {
       const $postSettings = document.createElement("div")
       $postSettings.classList.add("postSettings")
 
-      const $postSettingsMenu = document.createElement("p")
+      const $postSettingsMenu = document.createElement("div")
       $postSettingsMenu.classList.add("postSettingsMenu")
       $postSettingsMenu.addEventListener("click", postMenu)
       $postSettingsMenu.textContent = "..."
@@ -144,7 +145,7 @@ export default {
       const $postLikes = document.createElement("p")
       $postLikes.classList.add("likes")
       $postLikes.addEventListener("click", addLikes)
-      $postLikes.setAttribute("isLiked", post.liked)
+      $postLikes.setAttribute("data-isLiked", post.liked)
       $postLikes.textContent = "Like"
 
       const $numberOfLikes = document.createElement("p")
@@ -173,6 +174,7 @@ export default {
         const $postImage = document.createElement("img")
         $postImage.classList.add("image")
         $postImage.setAttribute("src", post.imageUrl)
+        $postImage.setAttribute("alt", "Post image")
 
         $postContent.appendChild($postImage)
       }
@@ -248,17 +250,17 @@ export default {
 
     const addLikes = async (e) => {
       let target = e.target.closest(".post")
-      let postid = +target.attributes.postid.value
+      let postid = +target.getAttribute("data-postid")
       let likeCount = document.getElementById(`like${postid}`)
 
-      let likeState = e.target.attributes.isLiked.value
+      let likeState = e.target.getAttribute("data-isLiked")
       let $like = e.target
       console.log(likeState);
 
       if (likeState === "true") {
         likeCount.textContent--
         console.log("UNLIKE");
-        $like.setAttribute("isLiked", "false")
+        $like.setAttribute("data-isLiked", "false")
 
         const like = {
           userId: user.id,
@@ -272,7 +274,7 @@ export default {
       } else {
         likeCount.textContent++
         console.log("LIKE");
-        $like.setAttribute("isLiked", "true")
+        $like.setAttribute("data-isLiked", "true")
 
         const like = {
           userId: user.id,
@@ -287,7 +289,7 @@ export default {
     }
 
     const postMenu = async (e) => {
-      let postid = e.target.closest(".post").attributes.postid.value
+      let postid = e.target.closest(".post").getAttribute("data-postid")
       let menu = document.getElementById(`menu${postid}`)
       let menuActive = menu.classList.contains("active")
 
@@ -299,9 +301,9 @@ export default {
     }
 
     const modifyPost = async (e) => {
-      let postid = e.target.closest(".post").attributes.postid.value
-      let content = document.querySelector(`div[postid='${postid}'] div.content p`)
-      let img = document.querySelector(`div[postid='${postid}'] div.content p img`)
+      let postid = e.target.closest(".post").getAttribute("data-postid")
+      let content = document.querySelector(`div[data-postid='${postid}'] div.content p`)
+      let img = document.querySelector(`div[data-postid='${postid}'] div.content p img`)
 
       let popup = document.getElementById("modifyPostPopup")
       let popupActive = popup.classList.contains("popup-active")
@@ -309,7 +311,7 @@ export default {
       if (popupActive === false) {
         popup.classList.add("popup-active")
         document.getElementById("post").textContent = content.textContent
-        document.getElementById("post").attributes.postid.value = postid
+        document.getElementById("post").setAttribute("data-postid", postid)
         if (img) {
           // let filename = img.attributes.src.value.split("/images/")[1]
           document.getElementById("img").attributes.src.value = img.attributes.src.value
@@ -324,13 +326,13 @@ export default {
 
     const deletePost = async (e) => {
 
-      let postid = e.target.closest(".post").attributes.postid.value
+      let postid = e.target.closest(".post").getAttribute("data-postid")
       let popup = document.getElementById("deletePostPopup")
       let popupActive = popup.classList.contains("popup-active")
 
       if (popupActive === false) {
         popup.classList.add("popup-active")
-        document.getElementById("deletePostPopup").attributes.postid.value = postid
+        document.getElementById("deletePostPopup").setAttribute("data-postid", postid)
         document.querySelector("body").style.overflow = "hidden"
       } else {
         popup.classList.remove("popup-active")
@@ -338,7 +340,7 @@ export default {
     }
 
     const reportPost = async (e) => {
-      let postid = e.target.closest(".post").attributes.postid.value
+      let postid = e.target.closest(".post").getAttribute("data-postid")
       console.log("REPORT" + postid);
     }
 
@@ -354,6 +356,11 @@ export default {
             'Authorization': 'Bearer ' + token
           },
         }).then(function(response) {
+          // Redirect if user localStorage token expired
+          if (response.status == '401') {
+            window.location.href = '/#/login';
+            return response.json({ response });
+          }
           return response.json({ response });
         }).then((data) => {
           data.forEach((post) => {
@@ -409,9 +416,9 @@ export default {
 
     textListener(e) {
 
-      const closeBtn = document.querySelector("#newPost form div.form #close")
+      const closeBtn = document.querySelector("#newPost form div.form .close")
       const textArea = document.querySelector("#newPost form div.form #postNewPost")
-      const postBtn = document.querySelector("#newPost form div.form #submit")
+      const postBtn = document.querySelector("#newPost form div.form .submit")
 
       if (e.target.value) {
         closeBtn.classList.remove("disabled")
@@ -436,9 +443,9 @@ export default {
         this.imgPreview = URL.createObjectURL(this.$refs.mediaNewPost.files[0])
       }
 
-      const closeBtn = document.querySelector("#newPost form div.form #close")
+      const closeBtn = document.querySelector("#newPost form div.form .close")
       const textArea = document.querySelector("#newPost form div.form #postNewPost")
-      const postBtn = document.querySelector("#newPost form div.form #submit")
+      const postBtn = document.querySelector("#newPost form div.form .submit")
 
       if (this.$refs.mediaNewPost.files[0].name) {
         closeBtn.classList.remove("disabled")
@@ -453,7 +460,7 @@ export default {
 
     modifyPost(e) {
       event.preventDefault()
-      let postid = document.getElementById("post").attributes.postid.value
+      let postid = document.getElementById("post").getAttribute("data-postid")
       let popup = e.target.closest("div.popup")
       let imgRemoved = document.getElementById("img").attributes.removed
 
@@ -468,7 +475,7 @@ export default {
       formData.append("token", user.token)
       formData.append("content", this.$refs.postModify.value)
       if (imgRemoved) {
-        let img = document.querySelector(`div[postid='${postid}'] div.content p img`)
+        let img = document.querySelector(`div[data-postid='${postid}'] div.content p img`)
         let imageUrl = img.attributes.src.value
         formData.append("imgRemoved", imgRemoved.value)
         formData.append("imageUrl", imageUrl)
@@ -480,14 +487,14 @@ export default {
       popup.classList.remove("popup-active")
       document.getElementById("delete").classList.remove("delete-active")
       document.getElementById("post").textContent = ""
-      document.getElementById("post").attributes.postid.value = ""
+      document.getElementById("post").setAttribute("data-postid", "")
       document.getElementById("img").attributes.src.value = ""
       document.getElementById("img").removeAttribute("removed")
       document.querySelector("body").removeAttribute("style")
 
       // Modify post content to avoid refreshing the page
 
-      let post = document.querySelector(`div.post[postid='${postid}']`)
+      let post = document.querySelector(`div.post[data-postid='${postid}']`)
       let postContent = post.querySelector(".content p")
 
       if (this.$refs.postModify.value) {
@@ -529,8 +536,8 @@ export default {
       console.log(e);
       const user = JSON.parse(localStorage.getItem("user"))
 
-      let postid = e.target.closest("#deletePostPopup").attributes.postid.value
-      let post = document.querySelector(`div.post[postid='${postid}']`)
+      let postid = e.target.closest("#deletePostPopup").getAttribute("data-postid")
+      let post = document.querySelector(`div.post[data-postid='${postid}']`)
       console.log(post);
       user.postid = postid
       let popup = document.getElementById("deletePostPopup")
@@ -556,7 +563,7 @@ export default {
       popup.classList.remove("popup-active")
       document.getElementById("delete").classList.remove("delete-active")
       document.getElementById("post").textContent = ""
-      document.getElementById("post").attributes.postid.value = ""
+      document.getElementById("post").setAttribute("data-postid", "")
       document.getElementById("img").attributes.src.value = ""
       document.getElementById("img").removeAttribute("removed")
       document.querySelector("body").removeAttribute("style")
@@ -568,7 +575,7 @@ export default {
       let popup = e.target.closest("div.popup")
 
       popup.classList.remove("popup-active")
-      document.getElementById("deletePostPopup").attributes.postid.value = ""
+      document.getElementById("deletePostPopup").setAttribute("data-postid", "")
       document.querySelector("body").removeAttribute("style")
     },
 
@@ -577,8 +584,8 @@ export default {
 
       const textArea = document.querySelector("#newPost form div.form textarea")
       const inputFile = document.querySelector("#newPost form div.form input")
-      const closeBtn = document.querySelector("#newPost form div.form #close")
-      const postBtn = document.querySelector("#newPost form div.form #submit")
+      const closeBtn = document.querySelector("#newPost form div.form .close")
+      const postBtn = document.querySelector("#newPost form div.form .submit")
 
       textArea.value = ""
       this.imgPreview = ""
@@ -620,7 +627,7 @@ textarea {
 button {
 }
 
-#submit, #cancel, #avatarLabel, #mediaLabel {
+.submit, .cancel, #avatarLabel, #mediaLabel {
   background-color: #1877F2;
   color: white;
   font-size: 15px;
@@ -869,7 +876,7 @@ ul {
  }
 }
 
-#close {
+.close {
   position: absolute;
   top: 10px;
   right: 20px;
@@ -912,11 +919,11 @@ ul {
   cursor: pointer;
 }
 
-p[isLiked="false"] {
+p[data-isLiked="false"] {
 
 }
 
-p[isLiked="true"] {
+p[data-isLiked="true"] {
   color: #0080FF;
   font-weight: bold;
 }

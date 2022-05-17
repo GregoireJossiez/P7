@@ -18,7 +18,7 @@
           <span>
             <p id="res" class="warning">{{ $store.state.passwordMessage }}</p>
           </span>
-          <button id="submit" @click="logIn" value="Log in">Log In</button>
+          <button class="submit" @click="logIn" value="Log in">Log In</button>
         </div>
         <div id="signinForm" class="form form--hidden">
           <label for="EmailSignin">Email</label>
@@ -30,7 +30,7 @@
           <input ref="familyNameSignin" @focusout="formVerif" class="formInput" type="text" name="familyName" id="familyNameSignin" required>
           <label for="PasswordSignin">Password</label>
           <input ref="passwordSignin" @focusout="formVerif" class="formInput" type="password" name="Password" id="PasswordSignin" required>
-          <button id="submit" @click="signIn" value="Sign in">Sign in</button>
+          <button class="submit" @click="signIn" value="Sign in">Sign in</button>
         </div>
       </div>
     </section>
@@ -169,6 +169,13 @@ export default {
        }
 
         this.$store.dispatch('logIn', user);
+      } else {
+        if (!this.$refs.emailLogin.value) {
+          document.getElementById("EmailLogin").classList.add("formInput__warning")
+        }
+        if (!this.$refs.passwordLogin.value) {
+          document.getElementById("PasswordLogin").classList.add("formInput__warning")
+        }
       }
     },
 
@@ -188,6 +195,19 @@ export default {
         console.log(user);
 
         this.$store.dispatch('signIn', user);
+      }  else {
+        if (!this.$refs.emailSignin.value) {
+          document.getElementById("EmailSignin").classList.add("formInput__warning")
+        }
+        if (!this.$refs.nameSignin.value) {
+          document.getElementById("NameSignin").classList.add("formInput__warning")
+        }
+        if (!this.$refs.familyNameSignin.value) {
+          document.getElementById("familyNameSignin").classList.add("formInput__warning")
+        }
+        if (!this.$refs.passwordSignin.value) {
+          document.getElementById("PasswordSignin").classList.add("formInput__warning")
+        }
       }
     }
   }

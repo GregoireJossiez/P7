@@ -3,10 +3,10 @@
     <router-link id="home" v-if="!home" to="/">&#8249;</router-link>
     <h1 v-if="home">Home</h1>
     <h1 v-if="!home">Settings</h1>
-    <ul id="toggleMenu" open="false" @click="showMenu">
-      <p id="heaven" class="toggleMenu--btn">☰</p>
-      <p id="times" class="toggleMenu--btn disabled">&times;</p>
-      <li><router-link id="settings" to="/settings" class="disabled">Settings</router-link></li>
+    <ul id="toggleMenu" data-open="false" @click="showMenu">
+      <li id="heaven" class="toggleMenu--btn">☰</li>
+      <li id="times" class="toggleMenu--btn disabled">&times;</li>
+      <li><router-link id="settingsPageLink" to="/settings" class="disabled">Settings</router-link></li>
       <li><p id="logout" @click="logOut" class="disabled">Logout</p></li>
     </ul>
   </nav>
@@ -38,25 +38,25 @@ export default {
     showMenu() {
       console.log("TEST");
       let toggleMenu = document.getElementById("toggleMenu")
-      let settings = document.getElementById("settings")
+      let settings = document.getElementById("settingsPageLink")
       let logout = document.getElementById("logout")
       let heavenBtn = document.getElementById("heaven")
       let timesBtn = document.getElementById("times")
 
-      if (toggleMenu.attributes.open.value === "false") {
+      if (toggleMenu.getAttribute("data-open") === "false") {
         console.log("Opening");
         settings.classList.remove("disabled")
         logout.classList.remove("disabled")
         heavenBtn.classList.add("disabled")
         timesBtn.classList.remove("disabled")
-        toggleMenu.attributes.open.value = "true"
+        toggleMenu.setAttribute("data-open", "true")
       } else {
         console.log("Closing");
         settings.classList.add("disabled")
         logout.classList.add("disabled")
         timesBtn.classList.add("disabled")
         heavenBtn.classList.remove("disabled")
-        toggleMenu.attributes.open.value = "false"
+        toggleMenu.setAttribute("data-open", "false")
       }
     }
   }

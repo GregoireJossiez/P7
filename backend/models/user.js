@@ -32,19 +32,4 @@ const User = sequelize.define('user', {
   // Other model options go here
 })
 
-// User.sync({ alter: true }).then((data) => {
-//   console.log("Table and model synced successfully !");
-// }).catch((err) => {
-//   console.log("Error syncing the table and model !");
-//   console.log(err);
-// })
-
-// User.sync().then((data) => {
-//   return User.findOne()
-// }).then((data) => {
-//   console.log(data.toJSON());
-// }).catch((err) => {
-//   console.log(err);
-// })
-
 module.exports = sequelize.models.user

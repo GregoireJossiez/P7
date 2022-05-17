@@ -2,7 +2,7 @@
   <Nav/>
   <div id="changeAvatarPopup" class="popup">
     <div class="changeAvatarPopup">
-      <button id="close" @click="closePopup">&times;</button>
+      <button class="close" @click="closePopup">&times;</button>
       <span class="avatarPreview">
         <label for="media">Upload avatar</label>
         <vue-cropper v-if="imgSrc != ''"
@@ -17,79 +17,79 @@
         />
         <label id="avatarLabel" for="media">Choose a file</label>
         <input @change="avatarPreview" ref="media" id="media" type="file" name="media" value="" accept="image/png, image/jpeg, image/jpg, image/gif" style="display: none;">
-        <p id="mediaErrorMsg" class="warning disabled">{{ this.formErrorMsg }}</p>
+        <em id="mediaErrorMsg" class="warning disabled">{{ this.formErrorMsg }}</em>
       </span>
-      <button id="cancel" @click="closePopup" class="changePasswordPopup-btn changePasswordPopup-btn__cancel" type="button" name="cancel">Cancel</button>
-      <button id="submit" @click="changeAvatar" class="changePasswordPopup-btn changePasswordPopup-btn__delete" type="button" name="submit">Modify</button>
+      <button @click="closePopup" class="cancel changePasswordPopup-btn changePasswordPopup-btn__cancel" type="button" name="cancel">Cancel</button>
+      <button @click="changeAvatar" class="submit changePasswordPopup-btn changePasswordPopup-btn__delete" type="button" name="submit">Modify</button>
     </div>
   </div>
   <div id="modifyUserPopup" class="popup">
     <div class="modifyUserPopup">
-      <button id="close" @click="closePopup">&times;</button>
+      <button class="close" @click="closePopup">&times;</button>
       <span>
         <label for="name-popup">Name : </label>
-        <input id="name-popup" ref="name" type="text" name="" value="" required>
+        <input id="name-popup" ref="name" type="text" name="Name" value="" required>
 
         <label for="familyName-popup">Family name : </label>
-        <input id="familyName-popup" ref="familyName" type="text" name="" value="" required>
+        <input id="familyName-popup" ref="familyName" type="text" name="Family name" value="" required>
 
         <label for="email-popup">Email : </label>
-        <input id="email-popup" @focusout="formVerif" ref="email" type="email" name="" value="" required>
-        <p id="email-popupErrorMsg" class="warning disabled">{{ this.formErrorMsg }}</p>
+        <input id="email-popup" @focusout="formVerif" ref="email" type="email" name="Email" value="" required>
+        <em id="email-popupErrorMsg" class="warning disabled">{{ this.formErrorMsg }}</em>
       </span>
-      <button id="cancel" @click="closePopup" class="changePasswordPopup-btn changePasswordPopup-btn__cancel" type="button" name="cancel">Cancel</button>
-      <button id="submit" @click="modifyUser" class="changePasswordPopup-btn changePasswordPopup-btn__delete" type="button" name="submit">Modify</button>
+      <button @click="closePopup" class="cancel changePasswordPopup-btn changePasswordPopup-btn__cancel" type="button" name="cancel">Cancel</button>
+      <button @click="modifyUser" class="submit changePasswordPopup-btn changePasswordPopup-btn__delete" type="button" name="submit">Modify</button>
     </div>
   </div>
   <div id="changePasswordPopup" class="popup">
     <div class="changePasswordPopup">
-      <button id="close" @click="closePopup">&times;</button>
+      <button class="close" @click="closePopup">&times;</button>
       <div class="changePasswordForm">
         <span>
-          <label for="Current">Current : </label>
-          <input id="current" @focusout="formVerif" class="passInput" ref="current" type="password" name="" value="" required>
+          <label for="current">Current : </label>
+          <input id="current" @focusout="formVerif" class="passInput" ref="current" type="password" name="Current password" value="" required>
         </span>
         <span>
           <label for="new">New : </label>
-          <input id="new" @focusout="formVerif" class="passInput" ref="new" type="password" name="" value="" required>
+          <input id="new" @focusout="formVerif" class="passInput" ref="new" type="password" name="New passaword" value="" required>
         </span>
         <span>
           <label for="confirm">Confirm : </label>
-          <input id="confirm" @focusout="formVerif" class="passInput" ref="confirm" type="password" name="" value="" required>
+          <input id="confirm" @focusout="formVerif" class="passInput" ref="confirm" type="password" name="Confirm new password" value="" required>
         </span>
         <span>
-          <p id="res" class="warning">{{ $store.state.passwordMessage }}</p>
+          <em id="res" class="warning">{{ $store.state.passwordMessage }}</em>
         </span>
       </div>
-      <button id="cancel" @click="closePopup" class="changePasswordPopup-btn changePasswordPopup-btn__cancel" type="button" name="cancel">Cancel</button>
-      <button id="delete" @click="changePassword" class="changePasswordPopup-btn changePasswordPopup-btn__delete" type="button" name="delete">Change</button>
+      <button @click="closePopup" class="cancel changePasswordPopup-btn changePasswordPopup-btn__cancel" type="button" name="cancel">Cancel</button>
+      <button @click="changePassword" class="submit changePasswordPopup-btn changePasswordPopup-btn__delete" type="button" name="delete">Change</button>
     </div>
   </div>
   <div id="deletePostPopup" class="popup">
     <div class="deletePopup">
-      <button id="close" @click="closePopup">&times;</button>
+      <button class="close" @click="closePopup">&times;</button>
       <p class="deletePopup-txt">Are you sure you want to delete your account ?</p>
-      <button id="cancel" @click="closePopup" class="deletePopup-btn deletePopup-btn__cancel" type="button" name="cancel">Cancel</button>
-      <button id="delete" @click="deleteUser" class="deletePopup-btn deletePopup-btn__delete" type="button" name="delete">Delete</button>
+      <button @click="closePopup" class="cancel deletePopup-btn deletePopup-btn__cancel" type="button" name="cancel">Cancel</button>
+      <button id="delete" @click="deleteUser" class="submit deletePopup-btn deletePopup-btn__delete" type="button" name="delete">Delete</button>
     </div>
   </div>
   <div id="settings">
     <div id="userinfo" class="userinfo">
       <div class="avatar">
-        <img id="userAvatar" @mouseover="showChangeAvatarBtn" @mouseleave="showChangeAvatarBtn" src="" alt="">
+        <img id="userAvatar" @mouseover="showChangeAvatarBtn" @mouseleave="showChangeAvatarBtn" src="" alt="User avatar">
         <button id="changeAvatar" @mouseover="showChangeAvatarBtn" @mouseleave="showChangeAvatarBtn" @click="changeAvatarPopup" class="btn" type="button" name="button">Change</button>
       </div>
       <span>
         <label for="name">Name : </label>
-        <input id="name" type="text" name="" value="" disabled>
+        <input id="name" type="text" name="Name" value="" disabled>
       </span>
       <span>
         <label for="familyName">Family name : </label>
-        <input id="familyName" type="text" name="" value="" disabled>
+        <input id="familyName" type="text" name="Family name" value="" disabled>
       </span>
       <span>
         <label for="email">Email : </label>
-        <input id="email" type="email" name="" value="" disabled>
+        <input id="email" type="email" name="Email" value="" disabled>
       </span>
       <button id="modify" @click="modifyUserPopup" type="button" name="button">Modify</button>
       <button id="changePassword" @click="changePasswordPopup" type="button" name="button">Change your password</button>
@@ -155,8 +155,13 @@ export default {
           'Content-Type': 'application/json;charset=utf-8',
           'Authorization': 'Bearer ' + user.token
         },
-      }).then((res) => {
-        return res.json({ res })
+      }).then((response) => {
+        // Redirect if user localStorage token expired
+        if (response.status == '401') {
+          window.location.href = '/#/login';
+          return response.json({ response })
+        }
+        return response.json({ response })
       }).then((user) => {
         writeUserSettings(user)
       }).catch((err) => {
@@ -427,9 +432,7 @@ export default {
     deleteUser() {
       const user = JSON.parse(localStorage.getItem("user"))
 
-      this.$store.dispatch('deleteUser', user).then(() => {
-        localStorage.clear()
-      })
+      this.$store.dispatch('deleteUser', user)
     }
   },
 
@@ -443,6 +446,21 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+
+.close {
+  position: absolute;
+  top: 10px;
+  right: 20px;
+  font-size: 20px;
+  width: 25px;
+  background-color: lightgrey;
+  border: 0px;
+  border-radius: 25px;
+  &:hover {
+    cursor: pointer;
+    background-color: grey;
+  }
+}
 
 #settings {
   margin-top: 10px;

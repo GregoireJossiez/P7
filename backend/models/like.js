@@ -16,18 +16,4 @@ const Like = sequelize.define('like', {
     timestamps: false
 })
 
-// User.belongsToMany(Post,{
-//   through: Like
-// });
-// Post.belongsToMany(User,{
-//   through: Like
-// });
-
-// Like.sync({ alter: true }).then((data) => {
-//   console.log("Table and model synced successfully !");
-// }).catch((err) => {
-//   console.log("Error syncing the table and model !");
-//   console.log(err);
-// })
-
 module.exports = sequelize.models.like
