@@ -1,6 +1,7 @@
 const User = require("../models/user")
 const Post = require("../models/post")
 const Like = require("../models/like")
+const Comment = require("../models/comment")
 const Sequelize = require("sequelize")
 const sequelize = require("../db")
 const fs = require("fs")
@@ -11,9 +12,14 @@ exports.getAllPosts = (req, res, next) => {
     order: [
       ['id', 'DESC']
     ],
-    include: {
-      model: User
-    }
+    include: [
+      {
+        model: User
+      },
+      {
+        model: Comment
+      }
+    ]
   })
   .then((posts) => {
     User.findAll()
@@ -23,6 +29,11 @@ exports.getAllPosts = (req, res, next) => {
           if (user.dataValues.id === post.dataValues.userId) {
             post.dataValues.userAvatar = user.dataValues.avatar
           }
+          post.dataValues.comments.forEach((comment) => {
+            if (user.dataValues.id === comment.dataValues.userId) {
+              comment.dataValues.userAvatar = user.dataValues.avatar
+            }
+          });
         });
       });
 
@@ -38,27 +49,6 @@ exports.getOneUser = (req, res, next) => {
   .then(user => res.status(200).json(user))
   .catch(error => res.status(404).json({ error }))
 }
-
-// exports.deleteUser = (req, res, next) => {
-//   User.findOne({ where: { id: req.params.id }})
-//   .then(user => {
-//     if (!user) {
-//       return res.status(404).json({
-//         error: new Error("User non trouvé")
-//       })
-//     }
-//     if (user.id !== req.auth.userId) {
-//       return res.status(401).json({
-//         error: new Error("Requête non autorisée")
-//       })
-//     }
-//     User.findOne({ where: { id: req.params.id }})
-//     // Post.destroy({ where: { userId: req.params.id }})
-//     .then((user) => res.status(200).json({user}))
-//     .catch(error => res.status(400).json({ error }))
-//   })
-//   .catch(error => res.status(500).json({ error }))
-// }
 
 exports.modifyUser = (req, res, next) => {
   // Change AVATAR
@@ -86,7 +76,7 @@ exports.modifyUser = (req, res, next) => {
         where: {
         id: req.params.id
       }})
-      .then(() => res.status(200).json({ message: "Avatar changed" }))
+      .then(() => res.status(200).json({ message: "Avatar changed" + " " + req.file.filename }))
       .catch(error => res.status(400).json({ error }))
     })
     .catch(error => res.status(400).json({ error }))
@@ -110,7 +100,17 @@ exports.modifyUser = (req, res, next) => {
       where: {
         userId: req.params.id
       }})
-      .then(() => res.status(200).json({ message: "User info updated" }))
+      // .then(() => res.status(200).json({ message: "User info updated" }))
+      .then(() => {
+        Comment.update({
+          userNames: req.body.name + " " + req.body.familyName
+        }, {
+          where: {
+            userId: req.params.id
+          }})
+          .then(() => res.status(200).json({ message: "User info updated" }))
+          .catch(error => res.status(400).json({ error }))
+      })
       .catch(error => res.status(400).json({ error }))
     })
     .catch(error => res.status(400).json({ error }))
@@ -157,6 +157,7 @@ exports.deleteUser = (req, res, next) => {
         error: new Error("Requête non autorisée")
       })
     }
+    Comment.destroy({ where: { userId: req.params.id }})
     User.destroy({ where: { id: req.params.id }})
     .then(() => {
       Post.findAll({ where: { userId: req.params.id}})
@@ -207,31 +208,6 @@ if (!req.file) {
     .catch(error => res.status(400).json({ error }))
 }
 }
-
-// exports.modifyPost = (req, res, next) => {
-//   const postImage = req.file ?
-//     {
-//       ...JSON.parse(req.body.sauce),
-//       imageUrl: `${req.protocol}://${req.get("host")}/images/${req.file.filename}`
-//     } : { ...req.body }
-//   Post.updateOne({ where: { id: req.params.id }}, {...postImage, where: { id: req.params.id }})
-//   .then(() => res.status(200).json({message: "Objet modifié"}))
-//   .catch(error => res.status(400).json({ error }))
-// }
-
-// exports.modifyPost = (req, res, next) => {
-//   const postImage = req.file ?
-//     {
-//       content: req.body.content,
-//       userId: req.body.userid,
-//       authorName: req.body.name,
-//       authorFamilyName: req.body.familyName,
-//       imageUrl: `${req.protocol}://${req.get("host")}/images/${req.file.filename}`
-//     } : { ...req.body }
-//   Post.update({ where: { id: req.params.id }}, {...postImage, where: { id: req.params.id }})
-//   .then(() => res.status(200).json({message: "Objet modifié"}))
-//   .catch(error => res.status(400).json({ error }))
-// }
 
 exports.modifyPost = (req, res, next) => {
   if (!req.file) {
@@ -355,4 +331,49 @@ exports.likePost = (req, res, next) => {
     }
   })
   .catch(error => res.status(404).json({ error }))
+}
+
+exports.postComment = (req, res, next) => {
+  const comment = new Comment({
+    userNames: req.body.userNames,
+    content: req.body.content,
+    postId: req.body.postId,
+    userId: req.body.userId
+  })
+  comment.save()
+    .then(() => res.status(201).json({ message: "Comment posted !"}))
+    .catch(error => res.status(400).json({ error }))
+}
+
+exports.modifyComment = (req, res, next) => {
+  Comment.update({
+    content: req.body.content
+  }, {
+    where: {
+      id: req.params.id
+    }})
+  .then(() => res.status(200).json({message: "Comment modifed"}))
+  .catch(error => res.status(400).json({ error }))
+}
+
+exports.deleteComment = (req, res, next) => {
+  Comment.findOne({ where: { id: req.params.id }})
+    .then(comment => {
+      if (!comment) {
+        return res.status(404).json({
+          error: new Error("Objet non trouvé")
+        })
+      }
+      if (!req.admin) {
+        if (comment.userId !== req.auth.userId) {
+          return res.status(401).json({
+            error: new Error("Requête non autorisée")
+          })
+        }
+      }
+      Comment.destroy({ where: { id: req.params.id }})
+      .then(() => res.status(200).json({message: "Objet supprimé"}))
+      .catch(error => res.status(400).json({ error }))
+    })
+    .catch(error => res.status(500).json({ error }))
 }

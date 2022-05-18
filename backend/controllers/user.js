@@ -15,7 +15,6 @@ exports.signup = (req, res, next) => {
         password: hash
       })
       user.save()
-        // .then(() => res.status(201).json({ message: 'Utilisateur créé' }))
         .then(() => {
           User.findOne({ where : { email: req.body.email }})
             .then(user => {
@@ -79,59 +78,3 @@ exports.login = (req, res ,next) => {
     })
     .catch(error => res.status(500).json({ error }))
 }
-
-// exports.login = (req, res, next) => {
-//   User.findOne({ where: { username: req.body.username }})
-//   .then((data) => {
-//     return res.status(200).json({ data })
-//   }).catch(error => res.status(500).json({ error }))
-// }
-
-// exports.login = (req, res, next) => {
-//   User.findOne({ where: { username: req.body.username }})
-//   .then(data => {
-//     if (data != null) {
-//       return res.status(200).json({ data })
-//     } else {
-//       return res.status(404).json({ error: "User not found" })
-//     }
-//   }).catch(error => res.status(500).json({ error }))
-// }
-
-// exports.login = (req, res, next) => {
-//   User.sync().then(() => {
-//     return User.findOne();
-//   }).then((data) => {
-//     console.log(data.toJSON());
-//   }).catch((err) => {
-//     console.log(err);
-//   });
-// }
-
-// User.sync().then((data) => {
-//   return User.findOne()
-// }).then((data) => {
-//   console.log(data.toJSON());
-// }).catch((err) => {
-//   console.log(err);
-// })
-
-// Find all users
-// const users = await User.findAll();
-// console.log(users.every(user => user instanceof User)); // true
-// console.log("All users:", JSON.stringify(users, null, 2));
-
-// async function login() {
-//     // Find all users
-//   await User.findAll();
-//   console.log(users.every(user => user instanceof User)); // true
-//   console.log("All users:", JSON.stringify(users, null, 2));
-// }
-
-// User.sync().then(() => {
-//   return User.findOne({ where: { username: "francis" }});
-// }).then((user) => {
-//   console.log(user.password);
-// }).catch((err) => {
-//   console.log(err);
-// });

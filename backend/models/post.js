@@ -1,6 +1,7 @@
 const { Sequelize, DataTypes, HasOne } = require('sequelize');
 const User = require("../models/user")
 const Like = require("../models/like")
+const Comment = require("../models/comment")
 
 const sequelize = require("../db")
 
@@ -35,7 +36,14 @@ Post.belongsToMany(User,{
   through: Like
 });
 
-sequelize.sync().then((data) => {
+Post.hasMany(Comment)
+Comment.belongsTo(Post)
+User.hasMany(Comment, {
+  onDelete: 'CASCADE'
+})
+Comment.belongsTo(User)
+
+sequelize.sync({ alter: true }).then((data) => {
   console.log("Table and model synced successfully !");
 }).catch((err) => {
   console.log("Error syncing the table and model !");

@@ -4,7 +4,7 @@
     <form enctype="multipart/form-data">
       <div class="form form-modify">
         <button class="close" @click="closeModify">&times;</button>
-        <label for="post">Modify your post</label>
+        <label for="post">Modifier la publication</label>
         <textarea ref="postModify" id="post" data-postid="" name="Post" rows="8" cols="80" value=""></textarea>
         <div class="img-container">
           <img id="img" src="" alt="">
@@ -21,6 +21,14 @@
       <p class="deletePopup-txt">Are you sure you want to delete this post ?</p>
       <button @click="closeDelete" class="cancel deletePopup-btn deletePopup-btn__cancel" type="button" name="cancel">Cancel</button>
       <button @click="deletePost" class="deletePopup-btn deletePopup-btn__delete" type="button" name="delete">Delete</button>
+    </div>
+  </div>
+  <div id="deleteCommentPopup" data-commentid="" class="popup">
+    <div class="deletePopup">
+      <button class="close" @click="closeDelete">&times;</button>
+      <p class="deletePopup-txt">Are you sure you want to delete this comment ?</p>
+      <button @click="closeDelete" class="cancel deletePopup-btn deletePopup-btn__cancel" type="button" name="cancel">Cancel</button>
+      <button @click="deleteComment" class="deletePopup-btn deletePopup-btn__delete" type="button" name="delete">Delete</button>
     </div>
   </div>
   <div id="Posts">
@@ -81,7 +89,6 @@ export default {
       const $post = document.createElement("div")
       $post.classList.add("post")
       $post.setAttribute("data-postId", post.id)
-      // $post.setAttribute("data-v-6837beee", "")
 
       const $postTop = document.createElement("div")
       $postTop.classList.add("postTop")
@@ -128,10 +135,10 @@ export default {
       $delete.addEventListener("click", deletePost)
       $delete.textContent = "Delete publication"
 
-      const $report = document.createElement("li")
-      $report.classList.add("settingsMenuItem")
-      $report.addEventListener("click", reportPost)
-      $report.textContent = "Report publication"
+      // const $report = document.createElement("li")
+      // $report.classList.add("settingsMenuItem")
+      // $report.addEventListener("click", reportPost)
+      // $report.textContent = "Report publication"
 
       const $postContentDiv = document.createElement("div")
       $postContentDiv.classList.add("content")
@@ -153,6 +160,161 @@ export default {
       $numberOfLikes.setAttribute("id", `like${post.id}`)
       $numberOfLikes.textContent = post.likes
 
+      const $commentSection = document.createElement("div")
+      $commentSection.classList.add("commentSection")
+
+      const $seperator = document.createElement("hr")
+      $seperator.classList.add("separator")
+
+      const $commentSectionTitle = document.createElement("p")
+      $commentSectionTitle.classList.add("commentSection--title")
+      $commentSectionTitle.addEventListener("click", showCommentsSection)
+      if (post.comments.length === 1) {
+        $commentSectionTitle.textContent = `${post.comments.length} Comment`
+      }
+      if (post.comments.length > 1 || post.comments.length < 1) {
+        $commentSectionTitle.textContent = `${post.comments.length} Comments`
+      }
+
+      const $seperator2 = document.createElement("hr")
+      $seperator2.classList.add("separator")
+
+      const $commentsWrapper = document.createElement("div")
+      $commentsWrapper.classList.add("commentsWrapper")
+      $commentsWrapper.classList.add("disabled")
+
+      // Verify if there is comments
+      if (post.comments.length > 0) {
+        let comments = post.comments
+        // Reverse comments order
+        comments.sort((a,b)=>b-a)
+        // Create HTML element for each comment of the post
+        comments.forEach((comment) => {
+          const $comment = document.createElement("div")
+          $comment.classList.add("comment")
+          // Prevent front to try access non created elements
+          if (comment.userId === user.id || user.admin) {
+            $comment.addEventListener("mouseenter", showCommentSettingsMenu)
+            $comment.addEventListener("mouseleave", showCommentSettingsMenu)
+          }
+          $comment.setAttribute("data-commentId", comment.id)
+
+          const $commentAuthorAvatar = document.createElement("img")
+          $commentAuthorAvatar.classList.add("comment--avatar")
+          if (comment.userAvatar != undefined) {
+            $commentAuthorAvatar.setAttribute("src", comment.userAvatar)
+          } else {
+            $commentAuthorAvatar.setAttribute("src", "http://localhost:3000/images/default-avatar-1.jpeg")
+          }
+          $commentAuthorAvatar.setAttribute("alt", "User avatar")
+
+          const $commentContentWrapper = document.createElement("div")
+          $commentContentWrapper.classList.add("comment--contentWrapper")
+
+          const $commentSettings = document.createElement("div")
+          $commentSettings.classList.add("commentSettings")
+
+          const $commentSettingsMenuDiv = document.createElement("div")
+          $commentSettingsMenuDiv.classList.add("commentSettingsMenu")
+          $commentSettingsMenuDiv.classList.add("disabled")
+          $commentSettingsMenuDiv.addEventListener("click", commentMenu)
+          $commentSettingsMenuDiv.textContent = "..."
+
+          const $commentSettingsMenu = document.createElement("ul")
+          $commentSettingsMenu.setAttribute("id", `menuComment${comment.id}`)
+          $commentSettingsMenu.classList.add("settingsMenu")
+
+          const $commentModify = document.createElement("li")
+          $commentModify.classList.add("settingsMenuItem")
+          $commentModify.addEventListener("click", modifyComment)
+          $commentModify.textContent = "Modify comment"
+
+          const $commentDelete = document.createElement("li")
+          $commentDelete.classList.add("settingsMenuItem")
+          $commentDelete.addEventListener("click", deleteComment)
+          $commentDelete.textContent = "Delete comment"
+
+          const $commentAuthor = document.createElement("p")
+          $commentAuthor.classList.add("comment--author")
+          $commentAuthor.textContent = comment.userNames
+          const $commentContent = document.createElement("p")
+          $commentContent.classList.add("comment--content")
+          $commentContent.textContent = comment.content
+
+          var created = Date.parse(comment.createdAt);
+          var now = new Date().getTime();
+          var howLongAgo = created - now
+
+          const $commentDate = document.createElement("p")
+          $commentDate.classList.add("date")
+          $commentDate.textContent = getHumanTime(howLongAgo)
+
+          const $modifyCommentDiv = document.createElement("div")
+          $modifyCommentDiv.classList.add("modifyComment")
+          $modifyCommentDiv.setAttribute("data-commentid", comment.id)
+          $modifyCommentDiv.classList.add("disabled")
+
+          const $modifyCommentTextarea = document.createElement("textarea")
+          $modifyCommentTextarea.classList.add("modifyComment--textarea")
+          $modifyCommentTextarea.setAttribute("data-commentid", comment.id)
+          // $modifyCommentTextarea.setAttribute("value", comment.content)
+          $modifyCommentTextarea.textContent = comment.content
+
+          const $modifyCommentCloseBtn = document.createElement("button")
+          $modifyCommentCloseBtn.classList.add("close")
+          $modifyCommentCloseBtn.addEventListener("click", closeComment)
+          $modifyCommentCloseBtn.textContent = "×"
+
+          const $modifyCommentSubmitBtn = document.createElement("button")
+          // $newCommentSubmitBtn.classList.add("submit")
+          $modifyCommentSubmitBtn.addEventListener("click", postModifiedComment)
+          $modifyCommentSubmitBtn.classList.add("modifyComment--submit")
+          $modifyCommentSubmitBtn.textContent = ">"
+
+          $comment.appendChild($commentAuthorAvatar)
+          $commentContentWrapper.appendChild($commentAuthor)
+          $commentContentWrapper.appendChild($commentContent)
+          $commentContentWrapper.appendChild($commentDate)
+          $comment.appendChild($commentContentWrapper)
+
+          if (comment.userId === user.id || user.admin) {
+            $commentSettingsMenu.appendChild($commentModify)
+            $commentSettingsMenu.appendChild($commentDelete)
+            $commentSettingsMenuDiv.appendChild($commentSettingsMenu)
+            $commentSettings.appendChild($commentSettingsMenuDiv)
+
+            $modifyCommentDiv.appendChild($modifyCommentTextarea)
+            $modifyCommentDiv.appendChild($modifyCommentSubmitBtn)
+            $modifyCommentDiv.appendChild($modifyCommentCloseBtn)
+
+            $comment.appendChild($commentSettings)
+            $comment.appendChild($modifyCommentDiv)
+          }
+
+          $commentsWrapper.appendChild($comment)
+        });
+      }
+
+      const $newCommentDiv = document.createElement("div")
+      $newCommentDiv.classList.add("newComment")
+
+      const $newCommentUserAvatar = document.createElement("img")
+      $newCommentUserAvatar.classList.add("newComment--userAvatar")
+      // $newCommentUserAvatar.classList.add("userAvatar")
+      $newCommentUserAvatar.setAttribute("src", user.avatar)
+      $newCommentUserAvatar.setAttribute("alt", "User avatar")
+
+      const $newCommentTextarea = document.createElement("textarea")
+      $newCommentTextarea.classList.add("newComment--textarea")
+      $newCommentTextarea.setAttribute("data-postid", post.id)
+      $newCommentTextarea.setAttribute("placeholder", "Create a new comment")
+
+      const $newCommentSubmitBtn = document.createElement("button")
+      // $newCommentSubmitBtn.classList.add("submit")
+      $newCommentSubmitBtn.addEventListener("click", newComment)
+      $newCommentSubmitBtn.classList.add("newComment--submit")
+      $newCommentSubmitBtn.textContent = ">"
+
       $postInfo.appendChild($postUserAvatar)
       $postInfo.appendChild($postAuthor)
       $postInfo.appendChild($postDate)
@@ -163,7 +325,6 @@ export default {
         $postSettingsMenu.appendChild($settingsMenu)
         $postSettings.appendChild($postSettingsMenu)
       }
-
 
       $postTop.appendChild($postInfo)
       $postTop.appendChild($postSettings)
@@ -185,6 +346,18 @@ export default {
       $postReaction.appendChild($numberOfLikes)
 
       $postReaction.appendChild($postLikes)
+
+      $commentSection.appendChild($seperator)
+      $commentSection.appendChild($commentSectionTitle)
+      $commentSection.appendChild($seperator2)
+
+      $newCommentDiv.appendChild($newCommentUserAvatar)
+      $newCommentDiv.appendChild($newCommentTextarea)
+      $newCommentDiv.appendChild($newCommentSubmitBtn)
+
+      $commentSection.appendChild($commentsWrapper)
+      $commentSection.appendChild($newCommentDiv)
+      $postReaction.appendChild($commentSection)
 
       $post.appendChild($postReaction)
 
@@ -228,22 +401,22 @@ export default {
       // If there are hours
       else if (time > (1000 * 60 * 60)) {
         humanTime = parseInt(time / (1000 * 60 * 60), 10)
-        units = 'hours'
+        units = 'h'
       }
 
       // If there are minutes
       else if (time > (1000 * 60)) {
         humanTime = parseInt(time / (1000 * 60), 10)
-        units = 'minutes'
+        units = 'min'
       }
 
       // If there are seconds
       else if (time > (1000)) {
         humanTime = parseInt(time / (1000), 10)
-        units = 'seconds'
+        units = 'sec'
       }
 
-      return humanTime + ' ' + units + ' ' + 'ago'
+      return humanTime + ' ' + units
     }
 
     // Add likes function
@@ -339,9 +512,147 @@ export default {
       }
     }
 
-    const reportPost = async (e) => {
-      let postid = e.target.closest(".post").getAttribute("data-postid")
-      console.log("REPORT" + postid);
+    // newComment function
+
+    const newComment = async (e) => {
+      let post = e.target.closest("div[data-postid]")
+      let postId = post.getAttribute("data-postid")
+      let textarea = post.querySelector("div.reaction div.commentSection div.newComment textarea.newComment--textarea")
+      let content = textarea.value
+
+      if (textarea.value) {
+        let comment = {
+          postId: postId,
+          userId: user.id,
+          userNames: user.name + " " + user.familyName,
+          content: content,
+          token: user.token
+        }
+
+        this.$store.dispatch('newComment', comment);
+        textarea.value = ""
+        textarea.textContent = ""
+      }
+    }
+
+    const showCommentsSection = async (e) => {
+      let post = e.target.closest("div[data-postid]")
+      let commentsWrapper = post.querySelector("div.commentsWrapper")
+      let disabled = commentsWrapper.classList.contains("disabled")
+
+      if (disabled === true) {
+        commentsWrapper.classList.remove("disabled")
+      } else {
+        commentsWrapper.classList.add("disabled")
+      }
+    }
+
+    const showCommentSettingsMenu = async (e) => {
+      let comment = e.target.closest(".comment")
+      let commentid = comment.getAttribute("data-commentid")
+      let commentSettingsMenu = comment.querySelector(".commentSettingsMenu")
+      let modifyCommentDiv = document.querySelector(`div.modifyComment[data-commentid='${commentid}']`)
+      let menuDisabled = commentSettingsMenu.classList.contains("disabled")
+      let modifyDisabled = modifyCommentDiv.classList.contains("disabled")
+
+      if (modifyDisabled === true) {
+        if (menuDisabled === true) {
+          commentSettingsMenu.classList.remove("disabled")
+        } else {
+          commentSettingsMenu.classList.add("disabled")
+        }
+      }
+    }
+
+    const commentMenu = async (e) => {
+      let commentid = e.target.closest(".comment").getAttribute("data-commentid")
+      let menu = document.getElementById(`menuComment${commentid}`)
+      let menuActive = menu.classList.contains("active")
+
+      if (menuActive === false) {
+        menu.classList.add("active")
+      } else {
+        menu.classList.remove("active")
+      }
+    }
+
+    const modifyComment = async (e) => {
+      let comment = e.target.closest(".comment")
+      let commentid = comment.getAttribute("data-commentid")
+      let commentWrapper = comment.querySelector(".comment--contentWrapper")
+      let commentSettingsMenu = comment.querySelector(".commentSettings")
+      let modifyCommentDiv = document.querySelector(`div.modifyComment[data-commentid='${commentid}']`)
+      let disabled = modifyCommentDiv.classList.contains("disabled")
+
+      if (disabled === true) {
+        commentWrapper.classList.add("disabled")
+        commentSettingsMenu.classList.add("disabled")
+        modifyCommentDiv.classList.remove("disabled")
+      } else {
+        commentWrapper.classList.remove("disabled")
+        commentSettingsMenu.classList.remove("disabled")
+        modifyCommentDiv.classList.add("disabled")
+      }
+    }
+
+    const postModifiedComment = async (e) => {
+      let comment = e.target.closest("div[data-commentid]")
+      let commentId = comment.getAttribute("data-commentid")
+      let originalComment = document.querySelector(`div.comment[data-commentid='${commentId}'] div.comment--contentWrapper p.comment--content`)
+      let textarea = comment.querySelector("textarea")
+      let content = textarea.value
+
+      if (textarea.value) {
+        let comment = {
+          id: commentId,
+          userId: user.id,
+          content: content,
+          token: user.token
+        }
+
+        this.$store.dispatch('modifyComment', comment);
+        textarea.value = ""
+        textarea.textContent = ""
+
+        originalComment.textContent = content
+        modifyComment(e)
+      }
+    }
+
+    const closeComment = async (e) => {
+      event.preventDefault()
+
+      let comment = e.target.closest(".comment")
+      let commentid = comment.getAttribute("data-commentid")
+      let commentWrapper = comment.querySelector(".comment--contentWrapper")
+      let commentSettingsMenu = comment.querySelector(".commentSettings")
+      let modifyCommentDiv = document.querySelector(`div.modifyComment[data-commentid='${commentid}']`)
+      let disabled = modifyCommentDiv.classList.contains("disabled")
+
+      if (disabled === true) {
+        commentWrapper.classList.add("disabled")
+        commentSettingsMenu.classList.add("disabled")
+        modifyCommentDiv.classList.remove("disabled")
+      } else {
+        commentWrapper.classList.remove("disabled")
+        commentSettingsMenu.classList.remove("disabled")
+        modifyCommentDiv.classList.add("disabled")
+      }
+    }
+
+    const deleteComment = async (e) => {
+
+      let commentid = e.target.closest(".comment").getAttribute("data-commentid")
+      let popup = document.getElementById("deleteCommentPopup")
+      let popupActive = popup.classList.contains("popup-active")
+
+      if (popupActive === false) {
+        popup.classList.add("popup-active")
+        document.getElementById("deleteCommentPopup").setAttribute("data-commentid", commentid)
+        document.querySelector("body").style.overflow = "hidden"
+      } else {
+        popup.classList.remove("popup-active")
+      }
     }
 
     const main = async () => {
@@ -555,6 +866,39 @@ export default {
       popup.classList.remove("popup-active")
     },
 
+    deleteComment(e) {
+      event.preventDefault()
+
+      const user = JSON.parse(localStorage.getItem("user"))
+
+      let commentid = e.target.closest("#deleteCommentPopup").getAttribute("data-commentid")
+      let comment = document.querySelector(`div.comment[data-commentid='${commentid}']`)
+      let post = comment.closest("div[data-postid]")
+      let commentSectionTitle = post.querySelector("p.commentSection--title")
+      let numberOfComments = +commentSectionTitle.textContent.split(" ")[0]
+      console.log(comment);
+      user.commentid = commentid
+      let popup = document.getElementById("deleteCommentPopup")
+
+      this.$store.dispatch('deleteComment', user)
+
+      comment.remove()
+      document.querySelector("body").removeAttribute("style")
+      popup.classList.remove("popup-active")
+
+      console.log(post);
+      console.log(commentSectionTitle);
+      console.log(numberOfComments);
+
+      if (numberOfComments === 2) {
+        console.log("=== 1");
+        commentSectionTitle.textContent = --numberOfComments + " " + "Comment"
+      } else {
+        console.log("< 1 >");
+        commentSectionTitle.textContent = --numberOfComments + " " + "Comments"
+      }
+    },
+
     closeModify(e) {
       event.preventDefault()
 
@@ -685,6 +1029,103 @@ p {
   }
 }
 
+.commentSection {
+  &--title {
+    font-weight: bold;
+    &:hover {
+      cursor: pointer;
+      text-decoration: underline;
+    }
+  }
+}
+
+.commentsWrapper {
+  margin: auto;
+  display: flex;
+  flex-direction: column;
+  padding: 10px;
+  padding-bottom: 35px;
+  gap: 30px;
+  width: auto;
+}
+
+.comment {
+  display: flex;
+  &--avatar {
+    margin-right: 10px;
+    width: 40px;
+    height: 40px;
+    border-radius: 25px;
+  }
+  &--contentWrapper {
+    position: relative;
+    min-width: 100px;
+    padding: 5px 10px 5px 10px;
+    border: 1px solid black;
+    box-shadow: 0px 0px 5px lightgrey;
+    border-radius: 15px;
+  }
+  &--author {
+    text-align: left;
+    font-weight: bold;
+  }
+  &--content {
+    text-align: left;
+  }
+  .date {
+    position: absolute;
+    bottom: -20px;
+    right: 0px;
+  }
+  .modifyComment {
+    position: relative;
+    padding: 0px;
+    width: 100%;
+    &--textarea {
+      padding-right: 20px;
+    }
+    .close {
+      position: absolute;
+      top: 8px;
+      right: 60px;
+    }
+  }
+}
+
+.newComment, .modifyComment {
+  display: flex;
+  justify-content: space-between;
+  padding-left: 10px;
+  padding-right: 10px;
+  &--userAvatar {
+    margin-right: 10px;
+    width: 40px;
+    height: 40px;
+    border-radius: 25px;
+  }
+  &--textarea {
+    width: 100%;
+    height: 25px;
+    border-radius: 30px;
+  }
+  &--submit {
+    margin-left: 10px;
+    background-color: white;
+    border: 0px;
+    border-radius: 0px;
+    color: #1877F2;
+    font-size: 30px;
+    min-width: 42px;
+    width: 42px;
+    height: 42px;
+    &:hover {
+      cursor: pointer;
+      background-color: #E2E2E2;
+      border-radius: 42px;
+    }
+  }
+}
+
 .post {
   margin: auto;
   padding: 5px 0px 5px 0px;
@@ -721,7 +1162,7 @@ p {
   font-size: 12px;
 }
 
-.postSettings {
+.postSettings, .commentSettings {
   padding: 0px 10px 0px 20px;
   &Menu {
     padding: 0px 10px 10px 10px;
@@ -734,6 +1175,17 @@ p {
       border-radius: 20px;
       cursor: pointer;
     }
+  }
+}
+
+.commentSettings {
+  padding: 0px;
+  width: 110px;
+  margin: auto;
+  margin-left: 0px;
+  &Menu {
+    width: 20px;
+    height: 29px;
   }
 }
 
@@ -765,7 +1217,7 @@ ul {
   }
 }
 
-#modifyPostPopup, #deletePostPopup {
+#modifyPostPopup, #deletePostPopup, #deleteCommentPopup {
   position: absolute;
   top: 0;
   z-index: 1;

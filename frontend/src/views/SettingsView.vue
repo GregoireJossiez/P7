@@ -291,7 +291,6 @@ export default {
         const formData = new FormData()
         formData.append("userId", user.id)
         formData.append("token", user.token)
-        // formData.append("image", this.$refs.media.files[0])
         formData.append("image", file)
 
         this.$store.dispatch('changeAvatar', formData)

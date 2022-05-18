@@ -7,9 +7,9 @@ export default createStore({
       email: "",
       name: "",
       familyName: "",
-      password: "",
       token: "",
-      admin: ""
+      admin: "",
+      avatar: ""
     },
     passwordMessage: ""
   },
@@ -21,9 +21,9 @@ export default createStore({
       state.user.email = user.email,
       state.user.name = user.name,
       state.user.familyName = user.familyName,
-      state.user.password = user.password,
-      state.user.token = user.token
-      state.user.admin = user.admin
+      state.user.token = user.token,
+      state.user.admin = user.admin,
+      state.user.avatar = user.avatar
     },
     updatePasswordMessage (state, message) {
       state.passwordMessage = message
@@ -66,6 +66,8 @@ export default createStore({
           user.familyName = data.familyName
           user.token = data.token
           user.admin = data.admin
+          user.avatar = data.avatar
+          user.password = ""
 
           localStorage.setItem("user", JSON.stringify(user))
           context.commit("updateUser", user)
@@ -106,6 +108,8 @@ export default createStore({
           user.familyName = data.familyName
           user.token = data.token
           user.admin = data.admin
+          user.avatar = data.avatar
+          user.password = ""
 
           localStorage.setItem("user", JSON.stringify(user))
           context.commit("updateUser", user)
@@ -138,7 +142,7 @@ export default createStore({
         let reload = () => {
           window.location.reload()
         }
-        window.setTimeout(reload, 100)
+        window.setTimeout(reload, 1000)
         return response.json({ response });
       }).catch((err) => {
         console.log("Problème avec fetch : " + err.message);
@@ -217,6 +221,25 @@ export default createStore({
       }).then(function(response) {
         window.location.reload()
         return response.json({ response });
+      }).then((data) => {
+        if (data.error) {
+          console.log(data);
+        } else {
+          const filename = data.message.split("changed ")[1]
+          const avatarUrl = `http://localhost:3000/images/${filename}`
+
+          const user = JSON.parse(localStorage.getItem("user"))
+
+          user.id
+          user.name
+          user.familyName
+          user.token
+          user.admin
+          user.avatar = avatarUrl
+
+          localStorage.setItem("user", JSON.stringify(user))
+          context.commit("updateUser", user)
+        }
       }).catch((err) => {
         console.log("Problème avec fetch : " + err.message);
       })
@@ -290,6 +313,59 @@ export default createStore({
 
           window.setTimeout(redirect, 100)
         }
+        return response.json({ response });
+      }).catch((err) => {
+        console.log("Problème avec fetch : " + err.message);
+      })
+    },
+
+    newComment(context, comment) {
+      console.log(comment);
+
+      fetch("http://localhost:3000/api/post/comment/", {
+        method: 'POST',
+        body: JSON.stringify(comment),
+        headers: {
+          'Content-Type': 'application/json;charset=utf-8',
+          'Authorization': 'Bearer ' + comment.token
+        },
+      }).then(function(response) {
+        let reload = () => {
+          window.location.reload()
+        }
+        window.setTimeout(reload, 1000)
+        return response.json({ response });
+      }).catch((err) => {
+        console.log("Problème avec fetch : " + err.message);
+      })
+    },
+
+    modifyComment(context, comment) {
+      console.log(comment);
+
+      fetch(`http://localhost:3000/api/post/comment/${comment.id}`, {
+        method: 'PUT',
+        body: JSON.stringify(comment),
+        headers: {
+          'Content-Type': 'application/json;charset=utf-8',
+          'Authorization': 'Bearer ' + comment.token
+        },
+      }).then(function(response) {
+        return response.json({ response });
+      }).catch((err) => {
+        console.log("Problème avec fetch : " + err.message);
+      })
+    },
+
+    deleteComment(context, user) {
+      console.log(user);
+
+      fetch(`http://localhost:3000/api/post/comment/${user.commentid}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': 'Bearer ' + user.token
+        },
+      }).then(function(response) {
         return response.json({ response });
       }).catch((err) => {
         console.log("Problème avec fetch : " + err.message);
