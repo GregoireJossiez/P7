@@ -826,10 +826,13 @@ export default {
         }
       } else {
         console.log("IMAGE");
-        if (imgRemoved) {
+        if (imgRemoved.value === 'true') {
           if (this.$refs.media.files[0]) {
+            console.log("Image removed and replaced");
             postContent.querySelector("img").attributes.src.value = URL.createObjectURL(this.$refs.media.files[0])
           } else {
+            console.log("Image removed");
+            console.log(imgRemoved.value);
             postContent.querySelector("img").remove()
           }
         }

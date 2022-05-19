@@ -30,6 +30,11 @@ const User = sequelize.define('user', {
   }
   }, {
   // Other model options go here
+  indexes:
+  [{
+    unique: true,
+    fields: ['email']
+  }]
 })
 
 module.exports = sequelize.models.user
